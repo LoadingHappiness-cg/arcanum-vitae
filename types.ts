@@ -1,0 +1,49 @@
+
+export enum View {
+  HOME = 'home',
+  MUSIC = 'music',
+  WORDS = 'words',
+  VISUALS = 'visuals',
+  ABOUT = 'about',
+  MIRROR = 'mirror',
+  ARCHIVE = 'archive',
+  ADMIN = 'admin'
+}
+
+export interface Album {
+  id: string;
+  title: string;
+  year: string;
+  concept: string;
+  context: string;
+  tracks: Track[];
+  coverUrl: string;
+}
+
+export interface Track {
+  title: string;
+  lyrics: string;
+  story: string;
+  audioUrl: string; // URL to the MP3 file
+}
+
+export interface WordFragment {
+  id: string;
+  text: string;
+  source?: string;
+}
+
+export interface VisualItem {
+  id: string;
+  url: string;
+  title: string;
+  description: string;
+}
+
+export interface ArchiveItem {
+  id: string;
+  type: 'text' | 'image';
+  author: string;
+  content: string;
+  title?: string;
+}
