@@ -94,8 +94,8 @@ app.post('/api/curate', async (req, res) => {
 });
 
 
-// Fallback for SPA
-app.get('/:any*', (req, res) => {
+// Fallback for SPA - Catch-all middleware
+app.use((req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
