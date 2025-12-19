@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
 const DATA_PATH = path.join(__dirname, 'data', 'db.json');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
+
 
 app.use(cors());
 app.use(express.json());
@@ -41,6 +42,14 @@ const saveData = (data: any) => {
 };
 
 // API Endpoints
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: "active",
+        timestamp: new Date().toISOString(),
+        identity: "ARCANUM_VITAE_SYSTEM"
+    });
+});
+
 app.get('/api/data', (req, res) => {
     const data = loadData();
     res.json(data); // Returns null if no data saved yet, client will use INITIAL_DATA
@@ -86,11 +95,11 @@ app.post('/api/curate', async (req, res) => {
 
 
 // Fallback for SPA
-app.get('*', (req, res) => {
+app.get('(.*)', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(port, () => {
-    console.log(`Arcanum Vitae active on port ${port}`);
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Arcanum Vitae active on http://0.0.0.0:${port}`);
     console.log(`Data storage: ${DATA_PATH}`);
 });
