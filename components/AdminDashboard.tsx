@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration } from '../types';
+import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity } from '../types';
 
 interface AdminDashboardProps {
   data: {
@@ -8,6 +8,7 @@ interface AdminDashboardProps {
     fragments: WordFragment[];
     visuals: VisualItem[];
     humanManifesto?: string;
+    humanIdentity?: HumanIdentity;
     fictionDec?: FictionDeclaration;
     aiDec?: AiDeclaration;
   };
@@ -258,6 +259,48 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
               <p className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-widest text-right">
                 [ THIS CONTENT APPEARS AT THE BOTTOM OF THE ABOUT PAGE ]
               </p>
+            </div>
+
+            <div className="p-8 border border-stone-800 bg-black/20 space-y-4">
+              <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase mb-6">HUMAN_IDENTITY (FOOTER)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  className="w-full bg-black border border-stone-800 p-4 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
+                  value={localData.humanIdentity?.footerQuote || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    humanIdentity: { ...localData.humanIdentity!, footerQuote: e.target.value }
+                  })}
+                  placeholder="FOOTER_QUOTE"
+                />
+                <input
+                  className="w-full bg-black border border-stone-800 p-4 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
+                  value={localData.humanIdentity?.originLabel || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    humanIdentity: { ...localData.humanIdentity!, originLabel: e.target.value }
+                  })}
+                  placeholder="ORIGIN_LABEL"
+                />
+                <input
+                  className="w-full bg-black border border-stone-800 p-4 text-stone-300 font-syne font-bold uppercase"
+                  value={localData.humanIdentity?.veritasName || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    humanIdentity: { ...localData.humanIdentity!, veritasName: e.target.value }
+                  })}
+                  placeholder="VERITAS_NAME"
+                />
+                <input
+                  className="w-full bg-black border border-stone-800 p-4 text-stone-500 font-mono-machine text-[10px]"
+                  value={localData.humanIdentity?.veritasLink || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    humanIdentity: { ...localData.humanIdentity!, veritasLink: e.target.value }
+                  })}
+                  placeholder="LINK_URL"
+                />
+              </div>
             </div>
           </div>
         )}

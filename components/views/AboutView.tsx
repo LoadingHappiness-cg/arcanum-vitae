@@ -1,16 +1,18 @@
 import React from 'react';
 import { AI_DECLARATION, FICTION_DECLARATION } from '../../constants';
 import BandPortraits from '../BandPortraits';
-import { FictionDeclaration, AiDeclaration } from '../../types';
+import { FictionDeclaration, AiDeclaration, HumanIdentity } from '../../types';
 
 interface AboutViewProps {
     humanManifesto?: string;
+    humanIdentity?: HumanIdentity;
     fictionDec?: FictionDeclaration;
     aiDec?: AiDeclaration;
 }
 
 const AboutView: React.FC<AboutViewProps> = ({
     humanManifesto,
+    humanIdentity,
     fictionDec = FICTION_DECLARATION,
     aiDec = AI_DECLARATION
 }) => {
@@ -65,20 +67,24 @@ const AboutView: React.FC<AboutViewProps> = ({
                     </div>
 
                     <div className="mt-16 pt-16 border-t border-stone-900/50">
-                        <p className="text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest mb-4">
-                            these songs are personal because responsibility is personal.
-                        </p>
-                        <div className="mt-8 opacity-60 hover:opacity-100 transition-opacity">
-                            <span className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-widest mr-4">origin signal:</span>
-                            <a
-                                href="https://www.linkedin.com/in/carlos-gavela/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-stone-400 hover:text-red-600 font-syne font-bold uppercase tracking-widest text-xs transition-colors border-b border-stone-800 hover:border-red-600 pb-1"
-                            >
-                                Carlos Gavela
-                            </a>
-                        </div>
+                        {humanIdentity && (
+                            <>
+                                <p className="text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest mb-4">
+                                    {humanIdentity.footerQuote}
+                                </p>
+                                <div className="mt-8 opacity-60 hover:opacity-100 transition-opacity">
+                                    <span className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-widest mr-4">{humanIdentity.originLabel}</span>
+                                    <a
+                                        href={humanIdentity.veritasLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-stone-400 hover:text-red-600 font-syne font-bold uppercase tracking-widest text-xs transition-colors border-b border-stone-800 hover:border-red-600 pb-1"
+                                    >
+                                        {humanIdentity.veritasName}
+                                    </a>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

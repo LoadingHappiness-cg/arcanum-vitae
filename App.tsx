@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
-import { View, Album, WordFragment, VisualItem, FictionDeclaration, AiDeclaration } from './types';
+
+import { View, Album, WordFragment, VisualItem, FictionDeclaration, AiDeclaration, HumanIdentity } from './types';
 import Navigation from './components/Navigation';
 import TheMirror from './components/TheMirror';
 import ResistanceArchive from './components/ResistanceArchive';
@@ -15,6 +15,7 @@ import {
   FRAGMENTS as INITIAL_FRAGMENTS,
   VISUALS as INITIAL_VISUALS,
   INITIAL_HUMAN_MANIFESTO,
+  INITIAL_HUMAN_IDENTITY,
   FICTION_DECLARATION as INITIAL_FICTION_DEC,
   AI_DECLARATION as INITIAL_AI_DEC
 } from './constants';
@@ -30,6 +31,7 @@ const App: React.FC = () => {
   const [fragments, setFragments] = useState<WordFragment[]>(INITIAL_FRAGMENTS);
   const [visuals, setVisuals] = useState<VisualItem[]>(INITIAL_VISUALS);
   const [humanManifesto, setHumanManifesto] = useState<string>(INITIAL_HUMAN_MANIFESTO);
+  const [humanIdentity, setHumanIdentity] = useState<HumanIdentity>(INITIAL_HUMAN_IDENTITY);
   const [fictionDec, setFictionDec] = useState<FictionDeclaration>(INITIAL_FICTION_DEC);
   const [aiDec, setAiDec] = useState<AiDeclaration>(INITIAL_AI_DEC);
 
@@ -43,6 +45,7 @@ const App: React.FC = () => {
           if (data.fragments) setFragments(data.fragments);
           if (data.visuals) setVisuals(data.visuals);
           if (data.humanManifesto) setHumanManifesto(data.humanManifesto);
+          if (data.humanIdentity) setHumanIdentity(data.humanIdentity);
           if (data.fictionDec) setFictionDec(data.fictionDec);
           if (data.aiDec) setAiDec(data.aiDec);
         }
@@ -71,6 +74,7 @@ const App: React.FC = () => {
     setFragments(newData.fragments);
     setVisuals(newData.visuals);
     setHumanManifesto(newData.humanManifesto);
+    setHumanIdentity(newData.humanIdentity);
     setFictionDec(newData.fictionDec);
     setAiDec(newData.aiDec);
 
@@ -86,6 +90,7 @@ const App: React.FC = () => {
       localStorage.setItem('av_fragments', JSON.stringify(newData.fragments));
       localStorage.setItem('av_visuals', JSON.stringify(newData.visuals));
       localStorage.setItem('av_manifesto', newData.humanManifesto);
+      localStorage.setItem('av_identity', JSON.stringify(newData.humanIdentity));
       localStorage.setItem('av_fiction', JSON.stringify(newData.fictionDec));
       localStorage.setItem('av_ai', JSON.stringify(newData.aiDec));
     } catch (err) {
@@ -113,6 +118,7 @@ const App: React.FC = () => {
       case View.ABOUT: return (
         <AboutView
           humanManifesto={humanManifesto}
+          humanIdentity={humanIdentity}
           fictionDec={fictionDec}
           aiDec={aiDec}
         />
@@ -121,7 +127,7 @@ const App: React.FC = () => {
       case View.ARCHIVE: return <ResistanceArchive />;
       case View.ADMIN: return (
         <AdminDashboard
-          data={{ albums, fragments, visuals, humanManifesto, fictionDec, aiDec }}
+          data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec }}
           onSave={handleAdminSave}
           onExit={() => navigate(View.HOME)}
         />

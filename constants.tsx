@@ -61,6 +61,13 @@ this is assumed with care,
 with respect,
 and with intention.`;
 
+export const INITIAL_HUMAN_IDENTITY = {
+  footerQuote: "these songs are personal because responsibility is personal.",
+  originLabel: "origin signal:",
+  veritasName: "Carlos Gavela",
+  veritasLink: "https://www.linkedin.com/in/carlos-gavela/"
+};
+
 export const AI_DECLARATION = {
   main: "Arcanum Vitae is AI-generated music, guided and shaped by human intent.",
   body: [

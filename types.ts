@@ -59,3 +59,10 @@ export interface AiDeclaration {
   body: string[];
   tagline: string;
 }
+
+export interface HumanIdentity {
+  footerQuote: string;
+  originLabel: string;
+  veritasName: string;
+  veritasLink: string;
+}
