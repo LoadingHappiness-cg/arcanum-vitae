@@ -4,7 +4,7 @@ module.exports = {
       name: 'arcanum-vitae',
       script: 'npm',
       args: 'run start',
-      cwd: '/Users/carlosgavela/Projectos/arcanum-vitae',
+      cwd: __dirname,
       env: {
         NODE_ENV: 'production'
       }
