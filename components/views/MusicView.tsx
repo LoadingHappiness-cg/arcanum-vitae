@@ -52,7 +52,9 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                 {albums.map((album) => (
                     <div key={album.id} className="fade-in">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 items-start mb-24 pb-24 border-b border-stone-900">
-                            <div className="lg:col-span-1 sticky top-40 stagger-item">
+                            {/* Sticky Left Sidebar with Album Info & Track Index */}
+                            {/* self-start is CRITICAL for sticky to work in a grid item! */}
+                            <div className="lg:col-span-1 sticky top-32 self-start stagger-item max-h-[90vh] overflow-y-auto custom-scrollbar pr-4">
                                 <div className="relative group mb-8 overflow-hidden brutal-border hover:border-red-600 transition-colors bg-stone-900">
                                     <img
                                         src={album.coverUrl || 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800&h=800&auto=format&fit=crop'}
@@ -76,7 +78,7 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                                                     <button
                                                         onClick={() => scrollToTrack(uniqueId)}
                                                         className={`text-[10px] uppercase font-mono-machine text-left w-full transition-all duration-300 ${isPlaying
-                                                                ? 'text-red-500 font-bold tracking-widest translate-x-1'
+                                                                ? 'text-red-600 font-bold tracking-widest translate-x-2 border-l-2 border-red-600 pl-2'
                                                                 : 'text-stone-500 hover:text-stone-300 hover:tracking-wider'
                                                             }`}
                                                     >
@@ -89,13 +91,13 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                                 </div>
                             </div>
 
-                            <div className="lg:col-span-2">
+                            <div className="lg:col-span-2 pt-2">
                                 <div className="flex flex-col gap-0">
                                     {album.tracks.map((track, ti) => {
                                         const uniqueKey = track.id || `${album.id}-${ti}`;
                                         const scrollId = `track-${album.id}-${ti}`;
                                         return (
-                                            <div id={scrollId} key={uniqueKey} className="scroll-mt-48 transition-colors duration-500">
+                                            <div id={scrollId} key={uniqueKey} className="scroll-mt-32 transition-colors duration-500">
                                                 <AudioPlayer
                                                     track={track}
                                                     index={ti}
