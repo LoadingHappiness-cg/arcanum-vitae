@@ -14,7 +14,7 @@ const Navigation: React.FC<NavProps> = ({ currentView, onNavigate }) => {
     { label: 'VISUALS', value: View.VISUALS },
     { label: 'ARCHIVE', value: View.ARCHIVE },
     { label: 'ABOUT', value: View.ABOUT },
-    { label: 'THE MIRROR', value: View.MIRROR },
+    // { label: 'THE MIRROR', value: View.MIRROR }, // Disabled to conserve credits as per user request
   ];
 
   return (

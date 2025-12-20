@@ -96,7 +96,7 @@ const App: React.FC = () => {
       case View.WORDS: return <WordsView fragments={fragments} />;
       case View.VISUALS: return <VisualsView visuals={visuals} />;
       case View.ABOUT: return <AboutView />;
-      case View.MIRROR: return <TheMirror />;
+      // case View.MIRROR: return <TheMirror />; // Disabled
       case View.ARCHIVE: return <ResistanceArchive />;
       case View.ADMIN: return (
         <AdminDashboard
