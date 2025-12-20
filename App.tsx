@@ -40,6 +40,33 @@ const App: React.FC = () => {
   const [legalContent, setLegalContent] = useState(INITIAL_LEGAL_CONTENT);
   const [homeContent, setHomeContent] = useState(INITIAL_HOME_CONTENT);
 
+  const hydrateFromLocalStorage = () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const storedAlbums = localStorage.getItem('av_albums');
+      const storedFragments = localStorage.getItem('av_fragments');
+      const storedVisuals = localStorage.getItem('av_visuals');
+      const storedManifesto = localStorage.getItem('av_manifesto');
+      const storedIdentity = localStorage.getItem('av_identity');
+      const storedFiction = localStorage.getItem('av_fiction');
+      const storedAi = localStorage.getItem('av_ai');
+      const storedLegal = localStorage.getItem('av_legal');
+      const storedHome = localStorage.getItem('av_home');
+
+      if (storedAlbums) setAlbums(JSON.parse(storedAlbums));
+      if (storedFragments) setFragments(JSON.parse(storedFragments));
+      if (storedVisuals) setVisuals(JSON.parse(storedVisuals));
+      if (storedManifesto !== null) setHumanManifesto(storedManifesto);
+      if (storedIdentity) setHumanIdentity(JSON.parse(storedIdentity));
+      if (storedFiction) setFictionDec(JSON.parse(storedFiction));
+      if (storedAi) setAiDec(JSON.parse(storedAi));
+      if (storedLegal) setLegalContent(JSON.parse(storedLegal));
+      if (storedHome) setHomeContent(JSON.parse(storedHome));
+    } catch (error) {
+      console.error('Failed to hydrate from local storage:', error);
+    }
+  };
+
   useEffect(() => {
     // Fetch persisted data from server
     fetch('/api/data')
@@ -67,9 +94,14 @@ const App: React.FC = () => {
           if (Object.prototype.hasOwnProperty.call(data, 'homeContent')) {
             setHomeContent(data.homeContent ?? INITIAL_HOME_CONTENT);
           }
+        } else {
+          hydrateFromLocalStorage();
         }
       })
-      .catch(err => console.error("Failed to load server data:", err));
+      .catch(err => {
+        console.error("Failed to load server data:", err);
+        hydrateFromLocalStorage();
+      });
 
     // Initial loading animation
     const timer = setTimeout(() => setIsLoading(false), 2000);
