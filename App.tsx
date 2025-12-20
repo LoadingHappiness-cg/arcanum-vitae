@@ -19,7 +19,8 @@ import {
   INITIAL_HUMAN_IDENTITY,
   FICTION_DECLARATION as INITIAL_FICTION_DEC,
   AI_DECLARATION as INITIAL_AI_DEC,
-  INITIAL_LEGAL_CONTENT
+  INITIAL_LEGAL_CONTENT,
+  INITIAL_HOME_CONTENT
 } from './constants';
 
 const App: React.FC = () => {
@@ -37,6 +38,7 @@ const App: React.FC = () => {
   const [fictionDec, setFictionDec] = useState<FictionDeclaration>(INITIAL_FICTION_DEC);
   const [aiDec, setAiDec] = useState<AiDeclaration>(INITIAL_AI_DEC);
   const [legalContent, setLegalContent] = useState(INITIAL_LEGAL_CONTENT);
+  const [homeContent, setHomeContent] = useState(INITIAL_HOME_CONTENT);
 
   useEffect(() => {
     // Fetch persisted data from server
@@ -61,6 +63,9 @@ const App: React.FC = () => {
           }
           if (Object.prototype.hasOwnProperty.call(data, 'legalContent')) {
             setLegalContent(data.legalContent ?? INITIAL_LEGAL_CONTENT);
+          }
+          if (Object.prototype.hasOwnProperty.call(data, 'homeContent')) {
+            setHomeContent(data.homeContent ?? INITIAL_HOME_CONTENT);
           }
         }
       })
@@ -93,6 +98,7 @@ const App: React.FC = () => {
       fictionDec: newData.fictionDec ?? fictionDec,
       aiDec: newData.aiDec ?? aiDec,
       legalContent: newData.legalContent ?? legalContent,
+      homeContent: newData.homeContent ?? homeContent,
     };
 
     setAlbums(updated.albums);
@@ -103,6 +109,7 @@ const App: React.FC = () => {
     setFictionDec(updated.fictionDec);
     setAiDec(updated.aiDec);
     setLegalContent(updated.legalContent);
+    setHomeContent(updated.homeContent);
 
     // Also keep a local backup
     localStorage.setItem('av_albums', JSON.stringify(updated.albums));
@@ -113,6 +120,7 @@ const App: React.FC = () => {
     localStorage.setItem('av_fiction', JSON.stringify(updated.fictionDec));
     localStorage.setItem('av_ai', JSON.stringify(updated.aiDec));
     localStorage.setItem('av_legal', JSON.stringify(updated.legalContent));
+    localStorage.setItem('av_home', JSON.stringify(updated.homeContent));
   };
 
 
@@ -145,12 +153,12 @@ const App: React.FC = () => {
       case View.ARCHIVE: return <ResistanceArchive />;
       case View.ADMIN: return (
         <AdminDashboard
-          data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec, legalContent }}
+          data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec, legalContent, homeContent }}
           onSave={handleAdminSave}
           onExit={() => navigate(View.HOME)}
         />
       );
-      default: return <HomeView isEntered={isEntered} onEnter={() => setIsEntered(true)} />;
+      default: return <HomeView isEntered={isEntered} onEnter={() => setIsEntered(true)} homeContent={homeContent} />;
     }
   };
 

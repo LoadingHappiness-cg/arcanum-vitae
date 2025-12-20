@@ -80,3 +80,7 @@ export interface LegalContent {
   sections: LegalSection[];
   footer: string;
 }
+
+export interface HomeContent {
+  galleryMessage: string;
+}

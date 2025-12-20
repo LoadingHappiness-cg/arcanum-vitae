@@ -1,5 +1,5 @@
 
-import { Album, WordFragment, VisualItem, ArchiveItem, LegalContent } from './types';
+import { Album, WordFragment, VisualItem, ArchiveItem, LegalContent, HomeContent } from './types';
 
 export const ANCHOR_PHRASES = [
   "Art is not decoration. It is position.",
@@ -136,6 +136,14 @@ export const INITIAL_LEGAL_CONTENT: LegalContent = {
     }
   ],
   footer: "END_OF_PROTOCOL"
+};
+
+export const INITIAL_HOME_CONTENT: HomeContent = {
+  galleryMessage: [
+    "THESE IMAGES ARE RELICS, NOT DECORATION.",
+    "EACH FRAME IS A TRACE OF INTENT, A SIGNAL FROM THE FRACTURE.",
+    "WITNESS THEM. DO NOT CONSUME THEM."
+  ].join("\n")
 };
 
 export const ARTISTIC_STATEMENT = {

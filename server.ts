@@ -175,6 +175,11 @@ const isLegalContent = (value: unknown) => (
     value.sections.every(isLegalSection)
 );
 
+const isHomeContent = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.galleryMessage)
+);
+
 const validateData = (data: unknown) => {
     const errors: string[] = [];
     if (!isRecord(data)) {
@@ -211,6 +216,10 @@ const validateData = (data: unknown) => {
 
     if ('legalContent' in data && data.legalContent !== undefined && !isLegalContent(data.legalContent)) {
         errors.push('Invalid legalContent payload.');
+    }
+
+    if ('homeContent' in data && data.homeContent !== undefined && !isHomeContent(data.homeContent)) {
+        errors.push('Invalid homeContent payload.');
     }
 
     return { ok: errors.length === 0, errors };

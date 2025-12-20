@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity, LegalContent } from '../types';
-import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO, INITIAL_LEGAL_CONTENT } from '../constants';
+import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity, LegalContent, HomeContent } from '../types';
+import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO, INITIAL_LEGAL_CONTENT, INITIAL_HOME_CONTENT } from '../constants';
 
 interface AdminDashboardProps {
   data: {
@@ -13,6 +13,7 @@ interface AdminDashboardProps {
     fictionDec?: FictionDeclaration;
     aiDec?: AiDeclaration;
     legalContent?: LegalContent;
+    homeContent?: HomeContent;
   };
   onSave: (newData: any) => void;
   onExit: () => void;
@@ -24,7 +25,8 @@ const normalizeData = (input: AdminDashboardProps['data']) => ({
   humanIdentity: { ...INITIAL_HUMAN_IDENTITY, ...(input.humanIdentity ?? {}) },
   fictionDec: { ...FICTION_DECLARATION, ...(input.fictionDec ?? {}) },
   aiDec: { ...AI_DECLARATION, ...(input.aiDec ?? {}) },
-  legalContent: input.legalContent ?? INITIAL_LEGAL_CONTENT
+  legalContent: input.legalContent ?? INITIAL_LEGAL_CONTENT,
+  homeContent: input.homeContent ?? INITIAL_HOME_CONTENT
 });
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit }) => {
@@ -34,7 +36,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
   });
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(authToken));
   const [passkey, setPasskey] = useState('');
-  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'LEGAL' | 'SYSTEM'>('SOUNDS');
+  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'HOME' | 'LEGAL' | 'SYSTEM'>('SOUNDS');
   const [localData, setLocalData] = useState(() => normalizeData(data));
   const [nodeInfo, setNodeInfo] = useState({
     identifier: 'AV-NODE-01',
@@ -210,7 +212,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
         <div>
           <h2 className="text-4xl md:text-6xl font-extrabold tracking-tightest uppercase text-white mb-4">COMMAND_CENTER</h2>
           <div className="flex flex-wrap gap-4">
-            {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'LEGAL', 'SYSTEM'].map((tab) => (
+            {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'HOME', 'LEGAL', 'SYSTEM'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -385,6 +387,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                   placeholder="LINK_URL"
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'HOME' && localData.homeContent && (
+          <div className="space-y-12">
+            <div className="p-8 border border-stone-900 bg-black/40 space-y-4">
+              <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase mb-4">HOME_GALLERY_MESSAGE</h3>
+              <textarea
+                className="w-full h-40 bg-black border border-stone-800 p-4 text-stone-400 font-mono-machine text-[10px] uppercase leading-relaxed whitespace-pre-wrap"
+                value={localData.homeContent.galleryMessage}
+                onChange={(e) => setLocalData({
+                  ...localData,
+                  homeContent: { ...localData.homeContent!, galleryMessage: e.target.value }
+                })}
+                placeholder="GALLERY_MESSAGE (ONE LINE PER ROW)"
+              />
             </div>
           </div>
         )}

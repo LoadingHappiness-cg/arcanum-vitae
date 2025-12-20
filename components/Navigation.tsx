@@ -19,7 +19,7 @@ const Navigation: React.FC<NavProps> = ({ currentView, onNavigate }) => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 pointer-events-none p-6 md:p-8">
+    <nav className="md:fixed md:top-0 md:left-0 w-full z-50 pointer-events-none p-6 md:p-8">
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 pointer-events-auto max-w-[1920px] mx-auto bg-gradient-to-b from-black/80 to-transparent pb-12">
         <button
           onClick={() => onNavigate(View.HOME)}

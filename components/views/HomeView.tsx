@@ -1,10 +1,12 @@
 
 import React from 'react';
-import { ARTISTIC_STATEMENT, FICTION_DECLARATION, AI_DECLARATION } from '../../constants';
+import { ARTISTIC_STATEMENT, FICTION_DECLARATION, AI_DECLARATION, INITIAL_HOME_CONTENT } from '../../constants';
+import { HomeContent } from '../../types';
 
 interface HomeViewProps {
     isEntered: boolean;
     onEnter: () => void;
+    homeContent?: HomeContent;
 }
 
 const HOME_GALLERY = [
@@ -26,7 +28,7 @@ const HOME_GALLERY = [
     }
 ];
 
-const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter }) => {
+const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter, homeContent = INITIAL_HOME_CONTENT }) => {
     return (
         <div className="flex flex-col min-h-screen relative">
             <div className="scanline-red"></div>
@@ -93,6 +95,14 @@ const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter }) => {
                             <span className="text-[9px] font-mono-machine text-red-600 uppercase tracking-[0.6em]">IMAGE_RELICS</span>
                             <div className="h-[1px] flex-1 bg-red-900/40"></div>
                         </div>
+                        <p className="text-center text-stone-500 font-mono-machine text-[10px] uppercase tracking-[0.3em] leading-relaxed mb-10 fade-in">
+                            {homeContent.galleryMessage.split('\n').map((line, idx) => (
+                                <React.Fragment key={`${idx}-${line}`}>
+                                    {line}
+                                    {idx < homeContent.galleryMessage.split('\n').length - 1 && <br />}
+                                </React.Fragment>
+                            ))}
+                        </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {HOME_GALLERY.map((item, index) => (
                                 <div key={item.src} className="group relative aspect-[4/3] overflow-hidden border border-stone-900 bg-black">
