@@ -27,42 +27,6 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
     return (
         <div className="pt-32 pb-40 px-6 max-w-7xl mx-auto view-transition relative">
 
-            {/* Sidebar Navigation - Fixed HUD style, only visible on very wide screens to avoid overlap */}
-            <div className="fixed top-40 right-12 z-50 hidden 2xl:block w-56">
-                <div className="bg-black/80 backdrop-blur-md p-4 relative border-l border-red-900/30">
-                    {/* <div className="scanline-red opacity-10"></div> */}
-                    <h3 className="text-red-600 font-mono-machine text-[9px] tracking-[0.3em] uppercase mb-6 text-right opacity-80">
-                        INDEX_SEQUENCE
-                    </h3>
-                    <div className="space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2 text-right">
-                        {albums.map((album, ai) => (
-                            <div key={album.id}>
-                                <h4 className="text-stone-600 font-bold font-mono-machine text-[8px] uppercase tracking-widest mb-2 opacity-50">
-                                    {album.title}
-                                </h4>
-                                <ul className="space-y-1">
-                                    {album.tracks.map((track, ti) => {
-                                        const uniqueId = `track-${album.id}-${ti}`;
-                                        const isPlaying = currentPlayingId === (track.id || `${album.id}-${ti}`);
-                                        return (
-                                            <li key={uniqueId}>
-                                                <button
-                                                    onClick={() => scrollToTrack(uniqueId)}
-                                                    className={`text-[9px] uppercase font-mono-machine transition-all duration-300 ${isPlaying ? 'text-red-500 tracking-widest' : 'text-stone-500 hover:text-stone-300'
-                                                        }`}
-                                                >
-                                                    {track.title}
-                                                </button>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
             <div className="mb-32 fade-in">
                 <h2 className="text-6xl md:text-[14vw] font-extrabold tracking-tightest mb-10 leading-none uppercase text-white quantum-leap">Sounds</h2>
                 <div className="max-w-5xl p-12 border border-red-900/30 bg-stone-950/40 mb-20 backdrop-blur-sm relative overflow-hidden red-pulse-border">
@@ -98,7 +62,31 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                                     <div className="absolute inset-0 bg-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity mix-blend-overlay"></div>
                                 </div>
                                 <h3 className="text-4xl font-extrabold tracking-tightest uppercase mb-2 leading-none text-white">{album.title}</h3>
-                                <p className="text-red-600 font-mono-machine font-bold text-[10px] uppercase tracking-widest mb-6 border-b border-red-900 pb-2 inline-block">Released {album.year}</p>
+                                <p className="text-red-600 font-mono-machine font-bold text-[10px] uppercase tracking-widest mb-10 border-b border-red-900 pb-2 inline-block">Released {album.year}</p>
+
+                                {/* Track Navigation Index */}
+                                <div className="border-l border-stone-800 pl-6 mt-8 hidden lg:block">
+                                    <h4 className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-[0.3em] mb-6">Track Index</h4>
+                                    <ul className="space-y-3">
+                                        {album.tracks.map((track, ti) => {
+                                            const uniqueId = `track-${album.id}-${ti}`;
+                                            const isPlaying = currentPlayingId === (track.id || `${album.id}-${ti}`);
+                                            return (
+                                                <li key={uniqueId}>
+                                                    <button
+                                                        onClick={() => scrollToTrack(uniqueId)}
+                                                        className={`text-[10px] uppercase font-mono-machine text-left w-full transition-all duration-300 ${isPlaying
+                                                                ? 'text-red-500 font-bold tracking-widest translate-x-1'
+                                                                : 'text-stone-500 hover:text-stone-300 hover:tracking-wider'
+                                                            }`}
+                                                    >
+                                                        {ti + 1}. {track.title}
+                                                    </button>
+                                                </li>
+                                            )
+                                        })}
+                                    </ul>
+                                </div>
                             </div>
 
                             <div className="lg:col-span-2">
@@ -107,7 +95,7 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                                         const uniqueKey = track.id || `${album.id}-${ti}`;
                                         const scrollId = `track-${album.id}-${ti}`;
                                         return (
-                                            <div id={scrollId} key={uniqueKey} className="scroll-mt-40">
+                                            <div id={scrollId} key={uniqueKey} className="scroll-mt-48 transition-colors duration-500">
                                                 <AudioPlayer
                                                     track={track}
                                                     index={ti}
