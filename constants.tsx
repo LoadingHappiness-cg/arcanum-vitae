@@ -15,6 +15,52 @@ export const FICTION_DECLARATION = {
   tagline: "Manifested construct. Human truth."
 };
 
+export const INITIAL_HUMAN_MANIFESTO = `this project comes from a real person.
+
+not from a market concept,
+not from an image strategy,
+not from a character.
+
+every song here is personal.
+not in a confessional way,
+but in a responsible one.
+
+they are made of ideas i have carried,
+experiences i have lived through,
+doubts, failures, choices,
+and ethical concerns that do not resolve easily.
+
+i am not writing from absolute certainty.
+i am writing from the honest attempt
+to remain decent
+in a world that is complex, unjust, and contradictory.
+
+these songs reflect real inquietudes:
+about power and abuse,
+about silence and responsibility,
+about belonging, legacy, and memory,
+about what we pass on to those who come after us.
+
+there are no closed answers here.
+there are questions sustained over time.
+
+i believe art should not anesthetize,
+should not explain everything,
+should not sell redemption.
+
+it should accompany.
+it should echo.
+it should carry something that remains alive
+after the sound fades.
+
+if something here resonates,
+it is because it was lived
+before it was written.
+
+this is assumed with care,
+with respect,
+and with intention.`;
+
 export const AI_DECLARATION = {
   main: "Arcanum Vitae is AI-generated music, guided and shaped by human intent.",
   body: [
@@ -65,8 +111,8 @@ If you seek comfort, you have found the wrong frequency.
 If you seek the fire that gives birth to the dawn, welcome home.`,
     coverUrl: './album-art.png',
     tracks: [
-      { 
-        title: 'Rivers of Resistance', 
+      {
+        title: 'Rivers of Resistance',
         lyrics: `In 1947, a line condemned,  
 houses fell and lives would end.  
 Keys on the doors, no place to stay,  
@@ -110,7 +156,7 @@ voices silenced, but never gone.
 Every child’s cry becomes a flame,  
 calling the world to speak their name.  
 
-And Palestine will rise… will stand.`, 
+And Palestine will rise… will stand.`,
         story: `MANIFESTO: A RECORD OF LINES
 
 This work is not an opinion. It is a record.
@@ -123,10 +169,10 @@ This piece speaks of children who grow up behind walls, where even the sky is ra
 The Arabic words in this piece are not decoration. They are testimony. They speak of land that refuses disappearance. Of patience that flows like a river — not because it is endless, but because it is forced.
 
 This work was generated with artificial intelligence, guided by human conscience. We carry the moral weight. Standing is the only form of resistance left.`,
-        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' 
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
       },
-      { 
-        title: 'Children of Palestine', 
+      {
+        title: 'Children of Palestine',
         lyrics: `Streets of stone, the sky is torn, 
 Dreams are broken before they’re born. 
 Tiny hands in the dust they play, 
@@ -166,7 +212,7 @@ Through the sorrow, their laughter rings.
 Shadows fall but the light remains, 
 Innocence dancing in chains.
 
-Every child deserves the sky`, 
+Every child deserves the sky`,
         story: `MANIFESTO: EVERY CHILD DESERVES THE SKY
 
 This work is not about conflict. It is about childhood under siege. It speaks of streets made of stone where dreams fracture before they learn to walk, where play happens in dust, and hope survives because it refuses to decay.
@@ -178,8 +224,8 @@ This piece holds a contradiction on purpose: innocence dancing in chains. Becaus
 Every child deserves the sky. Not tomorrow. Now. Because when innocence is chained, silence is not neutrality. It is participation.`,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
       },
-      { 
-        title: 'Children of Palestine II', 
+      {
+        title: 'Children of Palestine II',
         lyrics: `Children laid in streets of stone,  
 their toys are silent, their voices gone.  
 A cradle broken, a mother’s cry,  
@@ -225,7 +271,7 @@ we bury the young but we march on.
 Every cry is a wound unhealed,  
 every song a weapon, every word a shield.  
 
-And Palestine will rise… will stand.`, 
+And Palestine will rise… will stand.`,
         story: `MANIFESTO — CHILDREN OF PALESTINE II
 
 This work bears witness. It speaks of children laid on streets of stone, of toys gone silent, of cradles broken before lullabies could finish. It speaks of mothers who cry into a world that keeps walking.
@@ -243,8 +289,8 @@ This piece does not ask for hatred. It refuses forgetting. It does not call for 
 Children of Palestine is not a promise of victory. It is a refusal to accept that children should pay the price of history. Their voices will not fade. Their names will not dissolve into stone. And standing — sometimes — is the only form of truth left.`,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
       },
-      { 
-        title: 'Ḥurriya (Freedom)', 
+      {
+        title: 'Ḥurriya (Freedom)',
         lyrics: `I was born with chains unseen,  
 but the sky whispered: “Rise.”  
 Every wound became a door,  
@@ -281,7 +327,7 @@ but the spirit forever walks unbound.
 ḥurriya… my soul takes flight  
 taḥta ash-shams… bathed in light  
 bilā quyūd… my heart is free  
-ḥurriya… ḥurriya… sing with me`, 
+ḥurriya… ḥurriya… sing with me`,
         story: `MANIFESTO — ḤURRIYA
 
 This work is not about freedom as a slogan. It is about freedom as an irreversible awakening. It speaks of chains that are not always visible, of wounds that do not only injure — they open. Here, pain does not end the journey. It becomes the door.
@@ -301,8 +347,8 @@ This piece does not ask rulers for mercy. It does not negotiate dignity. It stat
 Ḥurriya is not a promise of arrival. It is the act of rising — again and again — under the same sun. And singing, not because it is safe, but because silence would be a lie.`,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
       },
-      { 
-        title: 'I Will Not Bend the Knee', 
+      {
+        title: 'I Will Not Bend the Knee',
         lyrics: `Silken halls and velvet thrones,
 Feasting while they starve our homes.
 Golden crowns on hollow heads,
@@ -331,7 +377,7 @@ To tyrants, sycophants, and liars.
 I would rather die standing,
 Than live forever in their fires.
 
-“We will not kneel!”`, 
+“We will not kneel!”`,
         story: `MANIFESTO — I WILL NOT BEND THE KNEE
 
 This work is a declaration of refusal.
@@ -350,33 +396,33 @@ Freedom is not a gift granted by rulers. It is a stance taken by those who refus
 “I will not bend the knee” is not a threat. It is a boundary. A line drawn where dignity ends and obedience is no longer an option. And standing — even alone — is sometimes the last act of truth available.`,
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3'
       },
-      { 
-        title: 'Bastards', 
-        lyrics: 'They wear the suits of order while they feed on chaos. Bastards of the system, we see the cracks. Your borders are lines in the sand, and the wind is coming.', 
+      {
+        title: 'Bastards',
+        lyrics: 'They wear the suits of order while they feed on chaos. Bastards of the system, we see the cracks. Your borders are lines in the sand, and the wind is coming.',
         story: 'Raw, aggressive, and industrial. A study on the systems that trade human life for efficiency.',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'
       },
-      { 
-        title: 'The Drop Returns', 
-        lyrics: 'One drop is a gesture. Ten thousand is a flood. The stone is patient, but the water is eternal. We are the moisture in the air before the storm breaks.', 
+      {
+        title: 'The Drop Returns',
+        lyrics: 'One drop is a gesture. Ten thousand is a flood. The stone is patient, but the water is eternal. We are the moisture in the air before the storm breaks.',
         story: 'Exploring the persistence of small acts. Resistance is not always a wave; sometimes it is a drip.',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'
       },
-      { 
-        title: 'Legacy', 
-        lyrics: 'What do we leave in the ashes? Not our possessions, but the shape of our defiance. Our children will not inherit our fear. They will inherit our fire.', 
+      {
+        title: 'Legacy',
+        lyrics: 'What do we leave in the ashes? Not our possessions, but the shape of our defiance. Our children will not inherit our fear. They will inherit our fire.',
         story: 'A somber look at what survives the conflict. A question of what remains when the music stops.',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3'
       },
-      { 
-        title: 'Echoes Beyond the Flame', 
-        lyrics: 'Burn the page, but the words stay in the smoke. We are the heat that power cannot cool. Silence is just the sound of us waiting.', 
+      {
+        title: 'Echoes Beyond the Flame',
+        lyrics: 'Burn the page, but the words stay in the smoke. We are the heat that power cannot cool. Silence is just the sound of us waiting.',
         story: 'Survival through memory. The sound utilizes burning textures to create a sense of urgent endurance.',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3'
       },
-      { 
-        title: 'The End of One Chapter (Bonus Track)', 
-        lyrics: 'The silence after the storm is not peace. It is the preparation for the next breath. This is not the end. It is only the threshold.', 
+      {
+        title: 'The End of One Chapter (Bonus Track)',
+        lyrics: 'The silence after the storm is not peace. It is the preparation for the next breath. This is not the end. It is only the threshold.',
         story: 'The closure of the initial manifest. A bridge to whatever fractures come next.',
         audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3'
       }

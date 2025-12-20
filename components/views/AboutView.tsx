@@ -44,6 +44,86 @@ const AboutView: React.FC = () => {
             </div>
 
             <BandPortraits />
+
+            <div className="mt-40 mb-20 max-w-2xl mx-auto text-center stagger-item">
+                <div className="w-px h-20 bg-red-900/50 mx-auto mb-12"></div>
+                <h3 className="text-red-900 font-mono-machine text-[9px] uppercase tracking-[0.6em] mb-12">The Human Source</h3>
+
+                <div className="space-y-8 text-stone-400 font-serif-brutal italic text-xl leading-relaxed">
+                    <p>this project comes from a real person.</p>
+                    <p>
+                        not from a market concept,<br />
+                        not from an image strategy,<br />
+                        not from a character.
+                    </p>
+                    <p>
+                        every song here is personal.<br />
+                        not in a confessional way,<br />
+                        but in a responsible one.
+                    </p>
+                    <p>
+                        they are made of ideas i have carried,<br />
+                        experiences i have lived through,<br />
+                        doubts, failures, choices,<br />
+                        and ethical concerns that do not resolve easily.
+                    </p>
+                    <p>
+                        i am not writing from absolute certainty.<br />
+                        i am writing from the honest attempt<br />
+                        to remain decent<br />
+                        in a world that is complex, unjust, and contradictory.
+                    </p>
+                    <p>
+                        these songs reflect real inquietudes:<br />
+                        about power and abuse,<br />
+                        about silence and responsibility,<br />
+                        about belonging, legacy, and memory,<br />
+                        about what we pass on to those who come after us.
+                    </p>
+                    <p>
+                        there are no closed answers here.<br />
+                        there are questions sustained over time.
+                    </p>
+                    <p>
+                        i believe art should not anesthetize,<br />
+                        should not explain everything,<br />
+                        should not sell redemption.
+                    </p>
+                    <p>
+                        it should accompany.<br />
+                        it should echo.<br />
+                        it should carry something that remains alive<br />
+                        after the sound fades.
+                    </p>
+                    <p>
+                        if something here resonates,<br />
+                        it is because it was lived<br />
+                        before it was written.
+                    </p>
+                    <p>
+                        this is assumed with care,<br />
+                        with respect,<br />
+                        and with intention.
+                    </p>
+                </div>
+
+                <div className="mt-16 pt-16 border-t border-stone-900/50">
+                    <p className="text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest mb-4">
+                        these songs are personal because responsibility is personal.
+                    </p>
+                    <div className="mt-8 opacity-60 hover:opacity-100 transition-opacity">
+                        <span className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-widest mr-4">origin signal:</span>
+                        <a
+                            href="https://www.linkedin.com/in/carlos-gavela/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-stone-400 hover:text-red-600 font-syne font-bold uppercase tracking-widest text-xs transition-colors border-b border-stone-800 hover:border-red-600 pb-1"
+                        >
+                            Carlos Gavela
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

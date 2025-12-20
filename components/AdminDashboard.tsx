@@ -7,6 +7,7 @@ interface AdminDashboardProps {
     albums: Album[];
     fragments: WordFragment[];
     visuals: VisualItem[];
+    humanManifesto?: string;
   };
   onSave: (newData: any) => void;
   onExit: () => void;
@@ -15,7 +16,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passkey, setPasskey] = useState('');
-  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'SYSTEM'>('SOUNDS');
+  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'SYSTEM'>('SOUNDS');
   const [localData, setLocalData] = useState(data);
   const [nodeInfo, setNodeInfo] = useState({
     identifier: 'AV-NODE-01',
@@ -122,7 +123,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
         <div>
           <h2 className="text-4xl md:text-6xl font-extrabold tracking-tightest uppercase text-white mb-4">COMMAND_CENTER</h2>
           <div className="flex gap-4">
-            {['SOUNDS', 'WORDS', 'VISUALS', 'SYSTEM'].map((tab) => (
+            {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'SYSTEM'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -189,6 +190,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                 2. Run `docker build -t arcanum-vitae .`<br />
                 3. Deploy using `docker run -d -p 80:80 arcanum-vitae`<br />
                 4. Map internal IP to your reverse proxy on port 80.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'ABOUT' && (
+          <div className="space-y-12">
+            <div className="p-8 border border-red-900/20 bg-black/40 space-y-4">
+              <h3 className="text-red-900 font-mono-machine text-[10px] tracking-widest uppercase mb-6">HUMAN_MANIFESTO_SOURCE</h3>
+              <textarea
+                className="w-full h-[600px] bg-black border border-stone-800 p-6 font-serif-brutal text-stone-300 italic text-lg leading-relaxed focus:outline-none focus:border-red-900 resize-none whitespace-pre-wrap"
+                value={localData.humanManifesto || ''}
+                onChange={(e) => {
+                  setLocalData({ ...localData, humanManifesto: e.target.value });
+                }}
+                placeholder="Enter personal manifesto here..."
+              />
+              <p className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-widest text-right">
+                [ THIS CONTENT APPEARS AT THE BOTTOM OF THE ABOUT PAGE ]
               </p>
             </div>
           </div>
