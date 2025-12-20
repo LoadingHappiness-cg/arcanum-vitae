@@ -143,7 +143,29 @@ export const INITIAL_HOME_CONTENT: HomeContent = {
     "THESE IMAGES ARE RELICS, NOT DECORATION.",
     "EACH FRAME IS A TRACE OF INTENT, A SIGNAL FROM THE FRACTURE.",
     "WITNESS THEM. DO NOT CONSUME THEM."
-  ].join("\n")
+  ].join("\n"),
+  galleryItems: [
+    {
+      id: "manifest-01",
+      title: "RELIC_01",
+      manifesto: "WE REMEMBER THE WEIGHT OF STONE."
+    },
+    {
+      id: "manifest-02",
+      title: "RELIC_02",
+      manifesto: "THE HAND KEEPS THE PROOF."
+    },
+    {
+      id: "manifest-03",
+      title: "RELIC_03",
+      manifesto: "THE SIGNAL CUTS THROUGH FOG."
+    },
+    {
+      id: "manifest-04",
+      title: "RELIC_04",
+      manifesto: "WE WALK THE CORRIDOR, UNBOWED."
+    }
+  ]
 };
 
 export const ARTISTIC_STATEMENT = {

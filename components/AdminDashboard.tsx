@@ -405,6 +405,81 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                 placeholder="GALLERY_MESSAGE (ONE LINE PER ROW)"
               />
             </div>
+            <div className="space-y-8">
+              {localData.homeContent.galleryItems.map((item, i) => (
+                <div key={item.id} className="p-8 border border-stone-900 bg-black/30 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-red-900 font-mono-machine text-[10px] uppercase tracking-widest">RELIC_{String(i + 1).padStart(2, '0')}</span>
+                    <button
+                      onClick={() => {
+                        const nextItems = localData.homeContent!.galleryItems.filter((_, idx) => idx !== i);
+                        setLocalData({
+                          ...localData,
+                          homeContent: { ...localData.homeContent!, galleryItems: nextItems }
+                        });
+                      }}
+                      className="text-red-600 font-mono-machine text-[10px] hover:underline"
+                    >
+                      [ DELETE ]
+                    </button>
+                  </div>
+                  <input
+                    className="w-full bg-black border border-stone-800 p-3 text-stone-300 font-mono-machine text-[10px] uppercase tracking-widest"
+                    value={item.id}
+                    onChange={(e) => {
+                      const nextItems = [...localData.homeContent!.galleryItems];
+                      nextItems[i] = { ...nextItems[i], id: e.target.value };
+                      setLocalData({
+                        ...localData,
+                        homeContent: { ...localData.homeContent!, galleryItems: nextItems }
+                      });
+                    }}
+                    placeholder="IMAGE_ID (FILENAME WITHOUT .JPG)"
+                  />
+                  <input
+                    className="w-full bg-black border border-stone-800 p-3 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
+                    value={item.title}
+                    onChange={(e) => {
+                      const nextItems = [...localData.homeContent!.galleryItems];
+                      nextItems[i] = { ...nextItems[i], title: e.target.value };
+                      setLocalData({
+                        ...localData,
+                        homeContent: { ...localData.homeContent!, galleryItems: nextItems }
+                      });
+                    }}
+                    placeholder="RELIC_TITLE"
+                  />
+                  <textarea
+                    className="w-full h-24 bg-black border border-stone-800 p-4 text-stone-400 font-serif-brutal italic text-sm leading-relaxed"
+                    value={item.manifesto}
+                    onChange={(e) => {
+                      const nextItems = [...localData.homeContent!.galleryItems];
+                      nextItems[i] = { ...nextItems[i], manifesto: e.target.value };
+                      setLocalData({
+                        ...localData,
+                        homeContent: { ...localData.homeContent!, galleryItems: nextItems }
+                      });
+                    }}
+                    placeholder="MANIFESTO_LINE"
+                  />
+                </div>
+              ))}
+              <button
+                onClick={() => {
+                  const nextItems = [
+                    ...localData.homeContent!.galleryItems,
+                    { id: `manifest-${Date.now()}`, title: 'RELIC_NEW', manifesto: 'NEW_MANIFESTO' }
+                  ];
+                  setLocalData({
+                    ...localData,
+                    homeContent: { ...localData.homeContent!, galleryItems: nextItems }
+                  });
+                }}
+                className="w-full py-6 border-2 border-dashed border-stone-900 text-stone-700 font-mono-machine uppercase tracking-[0.5em] hover:text-red-900 hover:border-red-900 transition-all"
+              >
+                + APPEND_RELIC
+              </button>
+            </div>
           </div>
         )}
 

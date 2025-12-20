@@ -177,7 +177,14 @@ const isLegalContent = (value: unknown) => (
 
 const isHomeContent = (value: unknown) => (
     isRecord(value) &&
-    isString(value.galleryMessage)
+    isString(value.galleryMessage) &&
+    Array.isArray(value.galleryItems) &&
+    value.galleryItems.every((item) => (
+        isRecord(item) &&
+        isString(item.id) &&
+        isString(item.title) &&
+        isString(item.manifesto)
+    ))
 );
 
 const validateData = (data: unknown) => {

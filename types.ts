@@ -83,4 +83,9 @@ export interface LegalContent {
 
 export interface HomeContent {
   galleryMessage: string;
+  galleryItems: {
+    id: string;
+    title: string;
+    manifesto: string;
+  }[];
 }
