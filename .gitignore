@@ -29,3 +29,9 @@ data/
 .env.*
 !.env.example
 
+
+# User Media
+public/media/audio/*
+!public/media/audio/.gitkeep
+public/media/images/*
+!public/media/images/.gitkeep
