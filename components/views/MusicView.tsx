@@ -10,8 +10,51 @@ interface MusicViewProps {
 const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
     const [currentPlayingId, setCurrentPlayingId] = React.useState<string | number | null>(null);
 
+    const scrollToTrack = (id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
     return (
-        <div className="pt-32 pb-40 px-6 max-w-7xl mx-auto view-transition">
+        <div className="pt-32 pb-40 px-6 max-w-7xl mx-auto view-transition relative">
+            {/* Sticky Navigation Sidebar */}
+            <div className="fixed top-40 right-10 z-50 hidden xl:block w-64">
+                <div className="border border-red-900/20 bg-black/80 backdrop-blur-md p-6 relative">
+                    <div className="scanline-red opacity-10"></div>
+                    <h3 className="text-red-600 font-mono-machine text-[9px] tracking-[0.3em] uppercase mb-6 border-b border-red-900/30 pb-2">
+                        INDEX_SEQUENCE
+                    </h3>
+                    <div className="space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
+                        {albums.map((album, ai) => (
+                            <div key={album.id}>
+                                <h4 className="text-stone-500 font-bold font-mono-machine text-[8px] uppercase tracking-widest mb-3">
+                                    {album.title}
+                                </h4>
+                                <ul className="space-y-2 border-l border-stone-800 pl-4">
+                                    {album.tracks.map((track, ti) => {
+                                        const uniqueId = `track-${album.id}-${ti}`;
+                                        const isPlaying = currentPlayingId === (track.id || `${album.id}-${ti}`);
+                                        return (
+                                            <li key={uniqueId}>
+                                                <button
+                                                    onClick={() => scrollToTrack(uniqueId)}
+                                                    className={`text-[9px] uppercase font-mono-machine text-left w-full truncate transition-all duration-300 ${isPlaying ? 'text-red-500 tracking-widest pl-2 border-l-2 border-red-500' : 'text-stone-600 hover:text-stone-300 hover:pl-1'
+                                                        }`}
+                                                >
+                                                    {track.title}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
             <div className="mb-32 fade-in">
                 <h2 className="text-6xl md:text-[14vw] font-extrabold tracking-tightest mb-10 leading-none uppercase text-white quantum-leap">Sounds</h2>
                 <div className="max-w-5xl p-12 border border-red-900/30 bg-stone-950/40 mb-20 backdrop-blur-sm relative overflow-hidden red-pulse-border">
@@ -53,15 +96,17 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                             <div className="lg:col-span-2">
                                 <div className="flex flex-col gap-0">
                                     {album.tracks.map((track, ti) => {
-                                        const uniqueId = track.id || `${album.id}-${ti}`;
+                                        const uniqueKey = track.id || `${album.id}-${ti}`;
+                                        const scrollId = `track-${album.id}-${ti}`;
                                         return (
-                                            <AudioPlayer
-                                                key={uniqueId}
-                                                track={track}
-                                                index={ti}
-                                                isCurrentTrack={currentPlayingId === uniqueId}
-                                                onPlayRequest={() => setCurrentPlayingId(uniqueId)}
-                                            />
+                                            <div id={scrollId} key={uniqueKey} className="scroll-mt-40">
+                                                <AudioPlayer
+                                                    track={track}
+                                                    index={ti}
+                                                    isCurrentTrack={currentPlayingId === uniqueKey}
+                                                    onPlayRequest={() => setCurrentPlayingId(uniqueKey)}
+                                                />
+                                            </div>
                                         );
                                     })}
                                 </div>
