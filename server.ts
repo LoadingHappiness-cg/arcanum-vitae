@@ -23,7 +23,15 @@ app.use(express.json());
 
 // Serve static files from the Vite build
 app.use(express.static(path.join(__dirname, 'dist')));
-// Also serve public files (robots.txt, media, etc)
+
+// Serve media with no-cache to support hot-swapping files
+app.use('/media', express.static(path.join(__dirname, 'public', 'media'), {
+    setHeaders: (res) => {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    }
+}));
+
+// Also serve public files (robots.txt, etc)
 app.use(express.static(path.join(__dirname, 'public')));
 
 const API_KEY = process.env.GEMINI_API_KEY || "";
