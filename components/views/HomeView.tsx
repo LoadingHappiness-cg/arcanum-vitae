@@ -108,9 +108,6 @@ const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter, homeContent = I
                                 </div>
                             ))}
                         </div>
-                        <p className="mt-8 text-[9px] font-mono-machine text-stone-600 uppercase tracking-[0.4em] text-center">
-                            PLACE IMAGES IN `public/media/images/home/`
-                        </p>
                     </section>
                 </div>
             )}
