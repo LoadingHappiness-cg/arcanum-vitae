@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { View, Album, WordFragment, VisualItem } from './types';
+import { View, Album, WordFragment, VisualItem, FictionDeclaration, AiDeclaration } from './types';
 import Navigation from './components/Navigation';
 import TheMirror from './components/TheMirror';
 import ResistanceArchive from './components/ResistanceArchive';
@@ -14,7 +14,9 @@ import {
   ALBUMS as INITIAL_ALBUMS,
   FRAGMENTS as INITIAL_FRAGMENTS,
   VISUALS as INITIAL_VISUALS,
-  INITIAL_HUMAN_MANIFESTO
+  INITIAL_HUMAN_MANIFESTO,
+  FICTION_DECLARATION as INITIAL_FICTION_DEC,
+  AI_DECLARATION as INITIAL_AI_DEC
 } from './constants';
 
 const App: React.FC = () => {
@@ -28,6 +30,8 @@ const App: React.FC = () => {
   const [fragments, setFragments] = useState<WordFragment[]>(INITIAL_FRAGMENTS);
   const [visuals, setVisuals] = useState<VisualItem[]>(INITIAL_VISUALS);
   const [humanManifesto, setHumanManifesto] = useState<string>(INITIAL_HUMAN_MANIFESTO);
+  const [fictionDec, setFictionDec] = useState<FictionDeclaration>(INITIAL_FICTION_DEC);
+  const [aiDec, setAiDec] = useState<AiDeclaration>(INITIAL_AI_DEC);
 
   useEffect(() => {
     // Fetch persisted data from server
@@ -39,6 +43,8 @@ const App: React.FC = () => {
           if (data.fragments) setFragments(data.fragments);
           if (data.visuals) setVisuals(data.visuals);
           if (data.humanManifesto) setHumanManifesto(data.humanManifesto);
+          if (data.fictionDec) setFictionDec(data.fictionDec);
+          if (data.aiDec) setAiDec(data.aiDec);
         }
       })
       .catch(err => console.error("Failed to load server data:", err));
@@ -65,6 +71,8 @@ const App: React.FC = () => {
     setFragments(newData.fragments);
     setVisuals(newData.visuals);
     setHumanManifesto(newData.humanManifesto);
+    setFictionDec(newData.fictionDec);
+    setAiDec(newData.aiDec);
 
     // Save to server
     try {
@@ -78,6 +86,8 @@ const App: React.FC = () => {
       localStorage.setItem('av_fragments', JSON.stringify(newData.fragments));
       localStorage.setItem('av_visuals', JSON.stringify(newData.visuals));
       localStorage.setItem('av_manifesto', newData.humanManifesto);
+      localStorage.setItem('av_fiction', JSON.stringify(newData.fictionDec));
+      localStorage.setItem('av_ai', JSON.stringify(newData.aiDec));
     } catch (err) {
       console.error("Failed to save to server:", err);
     }
@@ -100,12 +110,18 @@ const App: React.FC = () => {
       case View.MUSIC: return <MusicView albums={albums} />;
       case View.WORDS: return <WordsView fragments={fragments} />;
       case View.VISUALS: return <VisualsView visuals={visuals} />;
-      case View.ABOUT: return <AboutView humanManifesto={humanManifesto} />;
+      case View.ABOUT: return (
+        <AboutView
+          humanManifesto={humanManifesto}
+          fictionDec={fictionDec}
+          aiDec={aiDec}
+        />
+      );
       // case View.MIRROR: return <TheMirror />; // Disabled
       case View.ARCHIVE: return <ResistanceArchive />;
       case View.ADMIN: return (
         <AdminDashboard
-          data={{ albums, fragments, visuals, humanManifesto }}
+          data={{ albums, fragments, visuals, humanManifesto, fictionDec, aiDec }}
           onSave={handleAdminSave}
           onExit={() => navigate(View.HOME)}
         />

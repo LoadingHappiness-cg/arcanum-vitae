@@ -47,3 +47,15 @@ export interface ArchiveItem {
   content: string;
   title?: string;
 }
+
+export interface FictionDeclaration {
+  main: string;
+  details: string;
+  tagline: string;
+}
+
+export interface AiDeclaration {
+  main: string;
+  body: string[];
+  tagline: string;
+}

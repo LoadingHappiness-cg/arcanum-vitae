@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Album, WordFragment, VisualItem, View } from '../types';
+import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration } from '../types';
 
 interface AdminDashboardProps {
   data: {
@@ -8,6 +8,8 @@ interface AdminDashboardProps {
     fragments: WordFragment[];
     visuals: VisualItem[];
     humanManifesto?: string;
+    fictionDec?: FictionDeclaration;
+    aiDec?: AiDeclaration;
   };
   onSave: (newData: any) => void;
   onExit: () => void;
@@ -197,6 +199,52 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
 
         {activeTab === 'ABOUT' && (
           <div className="space-y-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="p-8 border border-red-900/20 bg-black/40 space-y-4">
+                <h3 className="text-red-900 font-mono-machine text-[10px] tracking-widest uppercase mb-6">AI_DECLARATION</h3>
+                <input
+                  className="w-full bg-black border border-stone-800 p-4 text-stone-300 font-mono-machine text-[10px] uppercase"
+                  value={localData.aiDec?.main || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    aiDec: { ...localData.aiDec!, main: e.target.value }
+                  })}
+                  placeholder="MAIN_HEADER"
+                />
+                <textarea
+                  className="w-full h-40 bg-black border border-stone-800 p-4 text-stone-400 font-serif-brutal italic text-sm"
+                  value={localData.aiDec?.body.join('\n') || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    aiDec: { ...localData.aiDec!, body: e.target.value.split('\n') }
+                  })}
+                  placeholder="BODY_PARAGRAPHS (ONE PER LINE)"
+                />
+              </div>
+
+              <div className="p-8 border border-stone-800 bg-black/20 space-y-4">
+                <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase mb-6">FICTION_DECLARATION</h3>
+                <input
+                  className="w-full bg-black border border-stone-800 p-4 text-stone-300 font-mono-machine text-[10px] uppercase"
+                  value={localData.fictionDec?.details || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    fictionDec: { ...localData.fictionDec!, details: e.target.value }
+                  })}
+                  placeholder="DETAILS (ONTOLOGICAL_STATUS)"
+                />
+                <input
+                  className="w-full bg-black border border-stone-800 p-4 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
+                  value={localData.fictionDec?.main || ''}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    fictionDec: { ...localData.fictionDec!, main: e.target.value }
+                  })}
+                  placeholder="MAIN_STATEMENT"
+                />
+              </div>
+            </div>
+
             <div className="p-8 border border-red-900/20 bg-black/40 space-y-4">
               <h3 className="text-red-900 font-mono-machine text-[10px] tracking-widest uppercase mb-6">HUMAN_MANIFESTO_SOURCE</h3>
               <textarea
