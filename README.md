@@ -26,3 +26,12 @@ Set the following in your `.env` when running the server:
 - `ADMIN_KEY`: required passkey to unlock the admin dashboard
 - `CORS_ORIGINS`: comma-separated list of allowed origins for API access
 - `ADMIN_TOKEN_TTL_MS`: optional token lifetime in milliseconds (default: 6h)
+
+## Production (PM2)
+
+1. Build the frontend:
+   `npm run build`
+2. Start the server with PM2 (from the project root):
+   `pm2 start ecosystem.config.cjs`
+3. Check logs:
+   `pm2 logs arcanum-vitae`
