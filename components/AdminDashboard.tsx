@@ -483,11 +483,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                     className="p-4 border border-stone-900 text-left hover:border-red-600 group transition-all"
                   >
                     <div className="text-[10px] text-stone-500 font-mono-machine mb-2 group-hover:text-red-900 transition-colors uppercase">
-                      FILE_PATH (OK)
+                      FILE_PATH (READY)
                     </div>
-                    <div className="text-sm font-syne font-bold text-stone-200 group-hover:text-white">
+                    <div className="text-sm font-syne font-bold text-stone-200 group-hover:text-white truncate">
                       {file.name}
                     </div>
+                    {browserSelection.type === 'audio' && (
+                      <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                        <audio controls src={file.url} className="w-full h-6 opacity-50 hover:opacity-100 transition-opacity" />
+                      </div>
+                    )}
                   </button>
                 ))
               )}
