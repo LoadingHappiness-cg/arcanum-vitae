@@ -31,7 +31,7 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                 <h2 className="text-6xl md:text-[14vw] font-extrabold tracking-tightest mb-10 leading-none uppercase text-white quantum-leap">Sounds</h2>
                 <div className="max-w-5xl p-6 md:p-12 border border-red-900/30 bg-stone-950/40 mb-20 backdrop-blur-sm relative overflow-hidden red-pulse-border">
                     <div className="scanline-red opacity-10"></div>
-                    <p className="text-red-600 font-mono-machine text-[10px] tracking-[0.5em] uppercase mb-8 underline decoration-red-600">ALBUM MANIFESTO: {albums[0]?.title || 'UNTITLED'}</p>
+                    <p className="text-red-600 font-mono-machine text-[10px] tracking-[0.5em] uppercase mb-8">ALBUM MANIFESTO: {albums[0]?.title || 'UNTITLED'}</p>
                     <div className="space-y-12">
                         <p className="text-3xl md:text-7xl font-extrabold tracking-tightest uppercase leading-none text-stone-100 italic reveal-mask drop-shadow-[0_0_15px_rgba(255,0,0,0.2)]">
                             "This work is not an <span className="text-red-600 hover-red-glow transition-all cursor-crosshair">opinion</span>. It is a <span className="text-red-600 hover-red-glow transition-all cursor-crosshair">record</span>."
