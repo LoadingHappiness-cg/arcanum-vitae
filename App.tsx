@@ -154,7 +154,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <main className="relative selection:bg-red-600 selection:text-white overflow-hidden bg-black min-h-screen">
+    <main className="relative selection:bg-red-600 selection:text-white bg-black min-h-screen">
       <div className="fixed inset-0 pointer-events-none opacity-[0.06] grain-overlay z-[100]"></div>
 
       {/* Background Ambience */}
