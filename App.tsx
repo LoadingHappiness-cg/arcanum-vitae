@@ -137,7 +137,9 @@ const App: React.FC = () => {
 
       {currentView !== View.ADMIN && <Navigation currentView={currentView} onNavigate={navigate} />}
 
-      <div className="relative">
+      <div className="fixed inset-0 pointer-events-none brutal-grid z-0"></div>
+
+      <div className="relative z-10">
         {renderContent()}
       </div>
 

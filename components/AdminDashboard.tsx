@@ -24,16 +24,51 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
     status: 'ACTIVE'
   });
 
+  const [browserSelection, setBrowserSelection] = useState<{ type: 'audio' | 'image', ai: number, ti?: number, vi?: number } | null>(null);
+  const [availableFiles, setAvailableFiles] = useState<{ name: string, url: string }[]>([]);
+
   useEffect(() => {
     if (isAuthenticated) {
       const interval = setInterval(() => {
         // Simple uptime simulator
         const now = new Date();
-        setNodeInfo(prev => ({...prev, uptime: now.toLocaleTimeString()}));
+        setNodeInfo(prev => ({ ...prev, uptime: now.toLocaleTimeString() }));
       }, 1000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated]);
+
+  const openFileBrowser = async (type: 'audio' | 'image', ai: number, ti?: number, vi?: number) => {
+    setBrowserSelection({ type, ai, ti, vi });
+    try {
+      const res = await fetch(`/api/files/list?type=${type}`);
+      const files = await res.json();
+      setAvailableFiles(files);
+    } catch (err) {
+      console.error("Failed to fetch files:", err);
+    }
+  };
+
+  const selectFile = (url: string) => {
+    if (!browserSelection) return;
+    const { type, ai, ti, vi } = browserSelection;
+
+    if (type === 'audio' && ai !== undefined && ti !== undefined) {
+      const newAlbums = [...localData.albums];
+      newAlbums[ai].tracks[ti].audioUrl = url;
+      setLocalData({ ...localData, albums: newAlbums });
+    } else if (type === 'image' && vi !== undefined) {
+      const newVisuals = [...localData.visuals];
+      newVisuals[vi].url = url;
+      setLocalData({ ...localData, visuals: newVisuals });
+    } else if (type === 'image' && ai !== undefined && ti === undefined) {
+      const newAlbums = [...localData.albums];
+      newAlbums[ai].coverUrl = url;
+      setLocalData({ ...localData, albums: newAlbums });
+    }
+
+    setBrowserSelection(null);
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +117,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
   return (
     <div className="min-h-screen pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col view-transition">
       <div className="scanline-red opacity-10"></div>
-      
+
       <div className="flex justify-between items-end mb-20">
         <div>
           <h2 className="text-4xl md:text-6xl font-extrabold tracking-tightest uppercase text-white mb-4">COMMAND_CENTER</h2>
@@ -91,9 +126,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
-                className={`text-[10px] font-mono-machine tracking-widest px-4 py-1 border transition-all ${
-                  activeTab === tab ? 'bg-red-600 border-red-600 text-black' : 'border-stone-800 text-stone-600 hover:text-white'
-                }`}
+                className={`text-[10px] font-mono-machine tracking-widest px-4 py-1 border transition-all ${activeTab === tab ? 'bg-red-600 border-red-600 text-black' : 'border-stone-800 text-stone-600 hover:text-white'
+                  }`}
               >
                 {tab}
               </button>
@@ -142,20 +176,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                 </div>
               </div>
               <div className="p-8 border border-stone-800 bg-black/20 flex items-center justify-center">
-                 <div className="text-center">
-                    <div className="w-12 h-12 border-2 border-red-900 border-dashed rounded-full mx-auto mb-6 animate-spin duration-[20s]"></div>
-                    <p className="text-stone-700 font-mono-machine text-[8px] uppercase tracking-[0.4em]">Node is healthy.<br/>Resistance is live.</p>
-                 </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 border-2 border-red-900 border-dashed rounded-full mx-auto mb-6 animate-spin duration-[20s]"></div>
+                  <p className="text-stone-700 font-mono-machine text-[8px] uppercase tracking-[0.4em]">Node is healthy.<br />Resistance is live.</p>
+                </div>
               </div>
             </div>
             <div className="p-8 border border-stone-900">
-               <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase mb-4">Self-Hosting Instructions</h3>
-               <p className="text-stone-500 font-mono-machine text-[9px] leading-relaxed uppercase">
-                1. Clone repository to LXC container.<br/>
-                2. Run `docker build -t arcanum-vitae .`<br/>
-                3. Deploy using `docker run -d -p 80:80 arcanum-vitae`<br/>
+              <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase mb-4">Self-Hosting Instructions</h3>
+              <p className="text-stone-500 font-mono-machine text-[9px] leading-relaxed uppercase">
+                1. Clone repository to LXC container.<br />
+                2. Run `docker build -t arcanum-vitae .`<br />
+                3. Deploy using `docker run -d -p 80:80 arcanum-vitae`<br />
                 4. Map internal IP to your reverse proxy on port 80.
-               </p>
+              </p>
             </div>
           </div>
         )}
@@ -166,10 +200,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
               <div key={frag.id} className="p-8 border border-stone-900 space-y-4">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-red-900 font-mono-machine text-[10px]">FRAGMENT_ID: {frag.id}</span>
-                  <button 
+                  <button
                     onClick={() => {
                       const newFrags = localData.fragments.filter((_, idx) => idx !== i);
-                      setLocalData({...localData, fragments: newFrags});
+                      setLocalData({ ...localData, fragments: newFrags });
                     }}
                     className="text-red-600 font-mono-machine text-[10px] hover:underline"
                   >
@@ -182,7 +216,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                   onChange={(e) => {
                     const newFrags = [...localData.fragments];
                     newFrags[i].text = e.target.value;
-                    setLocalData({...localData, fragments: newFrags});
+                    setLocalData({ ...localData, fragments: newFrags });
                   }}
                 />
                 <input
@@ -192,15 +226,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                   onChange={(e) => {
                     const newFrags = [...localData.fragments];
                     newFrags[i].source = e.target.value;
-                    setLocalData({...localData, fragments: newFrags});
+                    setLocalData({ ...localData, fragments: newFrags });
                   }}
                 />
               </div>
             ))}
-            <button 
+            <button
               onClick={() => {
                 setLocalData({
-                  ...localData, 
+                  ...localData,
                   fragments: [...localData.fragments, { id: `f${Date.now()}`, text: 'New Fragment' }]
                 });
               }}
@@ -217,33 +251,41 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
               <div key={vis.id} className="p-8 border border-stone-900 space-y-4 bg-black/40">
                 <div className="flex justify-between items-center">
                   <span className="text-red-900 font-mono-machine text-[10px]">VISUAL_ID: {vis.id}</span>
-                  <button 
+                  <button
                     onClick={() => {
                       const newVis = localData.visuals.filter((_, idx) => idx !== i);
-                      setLocalData({...localData, visuals: newVis});
+                      setLocalData({ ...localData, visuals: newVis });
                     }}
                     className="text-red-600 font-mono-machine text-[10px] hover:underline"
                   >
                     [ DELETE ]
                   </button>
                 </div>
-                <input
-                  className="w-full bg-black border border-stone-800 p-2 font-mono-machine text-[10px] text-stone-300"
-                  value={vis.url}
-                  onChange={(e) => {
-                    const newVis = [...localData.visuals];
-                    newVis[i].url = e.target.value;
-                    setLocalData({...localData, visuals: newVis});
-                  }}
-                  placeholder="IMAGE_URL"
-                />
+                <div className="flex gap-2">
+                  <input
+                    className="flex-1 bg-black border border-stone-800 p-2 font-mono-machine text-[10px] text-stone-300"
+                    value={vis.url}
+                    onChange={(e) => {
+                      const newVis = [...localData.visuals];
+                      newVis[i].url = e.target.value;
+                      setLocalData({ ...localData, visuals: newVis });
+                    }}
+                    placeholder="IMAGE_URL"
+                  />
+                  <button
+                    onClick={() => openFileBrowser('image', 0, undefined, i)}
+                    className="px-3 bg-stone-900 text-[8px] font-mono-machine text-stone-500 hover:text-white"
+                  >
+                    BROWSE
+                  </button>
+                </div>
                 <input
                   className="w-full bg-black border border-stone-800 p-2 font-syne font-bold uppercase text-white"
                   value={vis.title}
                   onChange={(e) => {
                     const newVis = [...localData.visuals];
                     newVis[i].title = e.target.value;
-                    setLocalData({...localData, visuals: newVis});
+                    setLocalData({ ...localData, visuals: newVis });
                   }}
                   placeholder="TITLE"
                 />
@@ -253,16 +295,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                   onChange={(e) => {
                     const newVis = [...localData.visuals];
                     newVis[i].description = e.target.value;
-                    setLocalData({...localData, visuals: newVis});
+                    setLocalData({ ...localData, visuals: newVis });
                   }}
                   placeholder="DESCRIPTION"
                 />
               </div>
             ))}
-            <button 
+            <button
               onClick={() => {
                 setLocalData({
-                  ...localData, 
+                  ...localData,
                   visuals: [...localData.visuals, { id: `v${Date.now()}`, url: '', title: 'NEW_VISUAL', description: 'NEW_DESC' }]
                 });
               }}
@@ -279,11 +321,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
               <div key={album.id} className="border border-red-900/20 p-8 md:p-12 space-y-8 bg-black/20">
                 <div className="flex justify-between items-center">
                   <h3 className="text-2xl font-extrabold uppercase text-white">ALBUM: {album.title}</h3>
-                  <button 
+                  <button
                     className="text-red-600 font-mono-machine text-[10px] hover:underline"
                     onClick={() => {
                       const newAlbums = localData.albums.filter((_, idx) => idx !== ai);
-                      setLocalData({...localData, albums: newAlbums});
+                      setLocalData({ ...localData, albums: newAlbums });
                     }}
                   >
                     [ PURGE_ALBUM ]
@@ -296,20 +338,38 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                     onChange={(e) => {
                       const newAlbums = [...localData.albums];
                       newAlbums[ai].title = e.target.value;
-                      setLocalData({...localData, albums: newAlbums});
+                      setLocalData({ ...localData, albums: newAlbums });
                     }}
                     placeholder="ALBUM_TITLE"
                   />
-                  <input
-                    className="w-full bg-black border border-stone-800 p-4 font-mono-machine text-stone-300"
-                    value={album.year}
-                    onChange={(e) => {
-                      const newAlbums = [...localData.albums];
-                      newAlbums[ai].year = e.target.value;
-                      setLocalData({...localData, albums: newAlbums});
-                    }}
-                    placeholder="RELEASE_YEAR"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 bg-black border border-stone-800 p-4 font-mono-machine text-stone-300"
+                      value={album.coverUrl}
+                      onChange={(e) => {
+                        const newAlbums = [...localData.albums];
+                        newAlbums[ai].coverUrl = e.target.value;
+                        setLocalData({ ...localData, albums: newAlbums });
+                      }}
+                      placeholder="ALBUM_COVER_URL"
+                    />
+                    <button
+                      onClick={() => openFileBrowser('image', ai)}
+                      className="px-4 bg-stone-900 text-[10px] font-mono-machine text-stone-500 hover:text-white"
+                    >
+                      BROWSE
+                    </button>
+                    <input
+                      className="w-32 bg-black border border-stone-800 p-4 font-mono-machine text-stone-300"
+                      value={album.year}
+                      onChange={(e) => {
+                        const newAlbums = [...localData.albums];
+                        newAlbums[ai].year = e.target.value;
+                        setLocalData({ ...localData, albums: newAlbums });
+                      }}
+                      placeholder="YEAR"
+                    />
+                  </div>
                 </div>
                 <textarea
                   className="w-full h-40 bg-black border border-stone-800 p-4 font-serif-brutal text-stone-400 italic"
@@ -317,53 +377,61 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                   onChange={(e) => {
                     const newAlbums = [...localData.albums];
                     newAlbums[ai].concept = e.target.value;
-                    setLocalData({...localData, albums: newAlbums});
+                    setLocalData({ ...localData, albums: newAlbums });
                   }}
                   placeholder="ALBUM_CONCEPT"
                 />
-                
+
                 <div className="space-y-8 pt-8 border-t border-stone-900">
                   <h4 className="text-[10px] font-mono-machine tracking-[0.4em] text-red-900 uppercase">TRACKLIST_DATA</h4>
                   {album.tracks.map((track, ti) => (
                     <div key={ti} className="p-6 border border-stone-900 space-y-4">
                       <div className="flex justify-between">
-                         <input
+                        <input
                           className="bg-transparent font-bold text-stone-200 border-b border-stone-800 focus:outline-none uppercase"
                           value={track.title}
                           onChange={(e) => {
                             const newAlbums = [...localData.albums];
                             newAlbums[ai].tracks[ti].title = e.target.value;
-                            setLocalData({...localData, albums: newAlbums});
+                            setLocalData({ ...localData, albums: newAlbums });
                           }}
                         />
-                        <button 
+                        <button
                           onClick={() => {
                             const newAlbums = [...localData.albums];
                             newAlbums[ai].tracks = newAlbums[ai].tracks.filter((_, idx) => idx !== ti);
-                            setLocalData({...localData, albums: newAlbums});
+                            setLocalData({ ...localData, albums: newAlbums });
                           }}
                           className="text-red-900 text-[8px] font-mono-machine hover:text-red-600"
                         >
                           [ DROP_TRACK ]
                         </button>
                       </div>
-                      <input
-                        className="w-full bg-black border border-stone-800 p-2 text-[10px] text-stone-500 font-mono-machine"
-                        value={track.audioUrl}
-                        onChange={(e) => {
-                          const newAlbums = [...localData.albums];
-                          newAlbums[ai].tracks[ti].audioUrl = e.target.value;
-                          setLocalData({...localData, albums: newAlbums});
-                        }}
-                        placeholder="AUDIO_URL"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          className="flex-1 bg-black border border-stone-800 p-2 text-[10px] text-stone-500 font-mono-machine"
+                          value={track.audioUrl}
+                          onChange={(e) => {
+                            const newAlbums = [...localData.albums];
+                            newAlbums[ai].tracks[ti].audioUrl = e.target.value;
+                            setLocalData({ ...localData, albums: newAlbums });
+                          }}
+                          placeholder="AUDIO_URL"
+                        />
+                        <button
+                          onClick={() => openFileBrowser('audio', ai, ti)}
+                          className="px-3 bg-stone-900 text-[8px] font-mono-machine text-stone-500 hover:text-white"
+                        >
+                          BROWSE
+                        </button>
+                      </div>
                     </div>
                   ))}
-                  <button 
+                  <button
                     onClick={() => {
                       const newAlbums = [...localData.albums];
                       newAlbums[ai].tracks.push({ title: 'NEW_TRACK', lyrics: '', story: '', audioUrl: '' });
-                      setLocalData({...localData, albums: newAlbums});
+                      setLocalData({ ...localData, albums: newAlbums });
                     }}
                     className="w-full py-4 border border-dashed border-stone-900 text-stone-700 font-mono-machine uppercase text-[9px] hover:text-red-900"
                   >
@@ -372,10 +440,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                 </div>
               </div>
             ))}
-            <button 
+            <button
               onClick={() => {
                 setLocalData({
-                  ...localData, 
+                  ...localData,
                   albums: [...localData.albums, { id: `a${Date.now()}`, title: 'NEW_ALBUM', year: '2025', concept: '', context: '', coverUrl: '', tracks: [] }]
                 });
               }}
@@ -386,6 +454,53 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
           </div>
         )}
       </div>
+
+      {browserSelection && (
+        <div className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="max-w-4xl w-full border border-red-900 bg-stone-950 p-12 max-h-[80vh] flex flex-col">
+            <div className="flex justify-between items-center mb-10">
+              <h3 className="text-xl font-extrabold uppercase text-white font-mono-machine tracking-[0.3em]">
+                SELECT_{browserSelection.type.toUpperCase()}_ASSET
+              </h3>
+              <button
+                onClick={() => setBrowserSelection(null)}
+                className="text-stone-500 hover:text-white font-mono-machine text-[10px]"
+              >
+                [ ESCAPE ]
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+              {availableFiles.length === 0 ? (
+                <div className="col-span-2 py-20 text-center border border-dashed border-stone-900 text-stone-700 font-mono-machine uppercase text-[10px]">
+                  NO_FILES_DETECTED_IN_MEDIA/{browserSelection.type}S/
+                </div>
+              ) : (
+                availableFiles.map((file) => (
+                  <button
+                    key={file.url}
+                    onClick={() => selectFile(file.url)}
+                    className="p-4 border border-stone-900 text-left hover:border-red-600 group transition-all"
+                  >
+                    <div className="text-[10px] text-stone-500 font-mono-machine mb-2 group-hover:text-red-900 transition-colors uppercase">
+                      FILE_PATH (OK)
+                    </div>
+                    <div className="text-sm font-syne font-bold text-stone-200 group-hover:text-white">
+                      {file.name}
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+
+            <div className="mt-10 pt-8 border-t border-stone-900">
+              <p className="text-[8px] font-mono-machine text-stone-700 uppercase leading-relaxed">
+                MANUAL_OVERRIDE: PLACE FILES IN `public/media/{browserSelection.type === 'audio' ? 'audio' : 'images'}/` DIRECTORY TO LIST THEM HERE.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

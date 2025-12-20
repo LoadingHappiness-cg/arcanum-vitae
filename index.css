@@ -170,12 +170,58 @@
   background: var(--color-primary);
   width: 0;
   animation: loadProgress 2s ease-in-out infinite;
-  box-shadow: 0 0 5px var(--color-primary);
+  box-shadow: 0 0 15px var(--color-primary);
 }
 @keyframes loadProgress {
   0% { width: 0; left: 0; }
   50% { width: 100%; left: 0; }
   100% { width: 0; left: 100%; }
+}
+
+.brutal-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 0, 0, 0.05) 1px, transparent 1px);
+}
+
+.brutal-border {
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  position: relative;
+}
+.brutal-border::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid var(--color-primary);
+  border-left: 2px solid var(--color-primary);
+}
+.brutal-border::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--color-primary);
+  border-right: 2px solid var(--color-primary);
+}
+
+.text-justify-brutal {
+  text-align: justify;
+  text-justify: inter-character;
+}
+
+.letter-spacing-huge {
+  letter-spacing: 0.8em;
+}
+
+.hover-red-glow:hover {
+  text-shadow: 0 0 10px var(--color-primary);
+  color: #fff;
 }
 
 /* Custom Utilities */
