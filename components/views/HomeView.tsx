@@ -86,7 +86,7 @@ const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter, homeContent = I
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             {homeContent.galleryItems.map((item, index) => (
-                                <div key={item.id} className="group relative aspect-[4/3] overflow-hidden border border-stone-900 bg-black">
+                                <div key={item.id} className="group relative aspect-[4/3] overflow-hidden border border-stone-900 bg-black transmission-glitch">
                                     <img
                                         src={`/media/images/home/${item.id}.jpg`}
                                         alt={item.title}
