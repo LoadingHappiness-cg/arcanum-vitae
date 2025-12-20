@@ -425,6 +425,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                           [ BROWSE ]
                         </button>
                       </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <textarea
+                          className="w-full h-32 bg-black border border-stone-800 p-2 font-serif-brutal text-stone-400 italic text-sm placeholder:font-mono-machine placeholder:not-italic focus:outline-none focus:border-red-900 transition-colors"
+                          value={track.story}
+                          onChange={(e) => {
+                            const newAlbums = [...localData.albums];
+                            newAlbums[ai].tracks[ti].story = e.target.value;
+                            setLocalData({ ...localData, albums: newAlbums });
+                          }}
+                          placeholder="TRACK_MANIFESTO (STORY)"
+                        />
+                        <textarea
+                          className="w-full h-32 bg-black border border-stone-800 p-2 font-mono-machine text-stone-500 text-[10px] leading-relaxed whitespace-pre focus:outline-none focus:border-red-900 transition-colors"
+                          value={track.lyrics}
+                          onChange={(e) => {
+                            const newAlbums = [...localData.albums];
+                            newAlbums[ai].tracks[ti].lyrics = e.target.value;
+                            setLocalData({ ...localData, albums: newAlbums });
+                          }}
+                          placeholder="LYRICS (TESTIMONY)"
+                        />
+                      </div>
                     </div>
                   ))}
                   <button
