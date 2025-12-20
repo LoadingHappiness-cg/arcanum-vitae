@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity } from '../types';
-import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO } from '../constants';
+import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity, LegalContent } from '../types';
+import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO, INITIAL_LEGAL_CONTENT } from '../constants';
 
 interface AdminDashboardProps {
   data: {
@@ -12,6 +12,7 @@ interface AdminDashboardProps {
     humanIdentity?: HumanIdentity;
     fictionDec?: FictionDeclaration;
     aiDec?: AiDeclaration;
+    legalContent?: LegalContent;
   };
   onSave: (newData: any) => void;
   onExit: () => void;
@@ -22,7 +23,8 @@ const normalizeData = (input: AdminDashboardProps['data']) => ({
   humanManifesto: input.humanManifesto ?? INITIAL_HUMAN_MANIFESTO,
   humanIdentity: { ...INITIAL_HUMAN_IDENTITY, ...(input.humanIdentity ?? {}) },
   fictionDec: { ...FICTION_DECLARATION, ...(input.fictionDec ?? {}) },
-  aiDec: { ...AI_DECLARATION, ...(input.aiDec ?? {}) }
+  aiDec: { ...AI_DECLARATION, ...(input.aiDec ?? {}) },
+  legalContent: input.legalContent ?? INITIAL_LEGAL_CONTENT
 });
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit }) => {
@@ -32,7 +34,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
   });
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(authToken));
   const [passkey, setPasskey] = useState('');
-  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'SYSTEM'>('SOUNDS');
+  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'LEGAL' | 'SYSTEM'>('SOUNDS');
   const [localData, setLocalData] = useState(() => normalizeData(data));
   const [nodeInfo, setNodeInfo] = useState({
     identifier: 'AV-NODE-01',
@@ -208,7 +210,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
         <div>
           <h2 className="text-4xl md:text-6xl font-extrabold tracking-tightest uppercase text-white mb-4">COMMAND_CENTER</h2>
           <div className="flex flex-wrap gap-4">
-            {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'SYSTEM'].map((tab) => (
+            {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'LEGAL', 'SYSTEM'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -383,6 +385,117 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                   placeholder="LINK_URL"
                 />
               </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'LEGAL' && localData.legalContent && (
+          <div className="space-y-12">
+            <div className="p-8 border border-stone-900 bg-black/40 space-y-4">
+              <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase mb-4">LEGAL_HEADER</h3>
+              <input
+                className="w-full bg-black border border-stone-800 p-4 text-stone-300 font-mono-machine text-[10px] uppercase tracking-widest"
+                value={localData.legalContent.heading}
+                onChange={(e) => setLocalData({
+                  ...localData,
+                  legalContent: { ...localData.legalContent!, heading: e.target.value }
+                })}
+                placeholder="LEGAL_PAGE_HEADING"
+              />
+              <input
+                className="w-full bg-black border border-stone-800 p-4 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
+                value={localData.legalContent.footer}
+                onChange={(e) => setLocalData({
+                  ...localData,
+                  legalContent: { ...localData.legalContent!, footer: e.target.value }
+                })}
+                placeholder="FOOTER_LABEL"
+              />
+            </div>
+
+            <div className="space-y-8">
+              {localData.legalContent.sections.map((section, i) => (
+                <div key={section.id} className="p-8 border border-stone-900 bg-black/30 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-red-900 font-mono-machine text-[10px] uppercase tracking-widest">SECTION_{i + 1}</span>
+                    <button
+                      onClick={() => {
+                        const nextSections = localData.legalContent!.sections.filter((_, idx) => idx !== i);
+                        setLocalData({
+                          ...localData,
+                          legalContent: { ...localData.legalContent!, sections: nextSections }
+                        });
+                      }}
+                      className="text-red-600 font-mono-machine text-[10px] hover:underline"
+                    >
+                      [ DELETE ]
+                    </button>
+                  </div>
+                  <input
+                    className="w-full bg-black border border-stone-800 p-3 text-stone-300 font-mono-machine text-[10px] uppercase tracking-widest"
+                    value={section.title}
+                    onChange={(e) => {
+                      const nextSections = [...localData.legalContent!.sections];
+                      nextSections[i] = { ...nextSections[i], title: e.target.value };
+                      setLocalData({
+                        ...localData,
+                        legalContent: { ...localData.legalContent!, sections: nextSections }
+                      });
+                    }}
+                    placeholder="SECTION_TITLE"
+                  />
+                  <textarea
+                    className="w-full h-40 bg-black border border-stone-800 p-4 text-stone-400 font-mono-machine text-[10px] uppercase leading-relaxed whitespace-pre-wrap"
+                    value={section.body}
+                    onChange={(e) => {
+                      const nextSections = [...localData.legalContent!.sections];
+                      nextSections[i] = { ...nextSections[i], body: e.target.value };
+                      setLocalData({
+                        ...localData,
+                        legalContent: { ...localData.legalContent!, sections: nextSections }
+                      });
+                    }}
+                    placeholder="SECTION_BODY (LINE BREAKS OK)"
+                  />
+                  <textarea
+                    className="w-full h-28 bg-black border border-stone-800 p-4 text-stone-500 font-mono-machine text-[10px] uppercase leading-relaxed whitespace-pre-wrap"
+                    value={(section.list || []).join('\n')}
+                    onChange={(e) => {
+                      const nextSections = [...localData.legalContent!.sections];
+                      const listValue = e.target.value.trim();
+                      nextSections[i] = {
+                        ...nextSections[i],
+                        list: listValue ? listValue.split('\n') : []
+                      };
+                      setLocalData({
+                        ...localData,
+                        legalContent: { ...localData.legalContent!, sections: nextSections }
+                      });
+                    }}
+                    placeholder="OPTIONAL_LIST_ITEMS (ONE PER LINE)"
+                  />
+                </div>
+              ))}
+              <button
+                onClick={() => {
+                  const nextSections = [
+                    ...localData.legalContent!.sections,
+                    {
+                      id: `legal-${Date.now()}`,
+                      title: '[ NEW_SECTION ]',
+                      body: 'NEW_BODY',
+                      list: []
+                    }
+                  ];
+                  setLocalData({
+                    ...localData,
+                    legalContent: { ...localData.legalContent!, sections: nextSections }
+                  });
+                }}
+                className="w-full py-6 border-2 border-dashed border-stone-900 text-stone-700 font-mono-machine uppercase tracking-[0.5em] hover:text-red-900 hover:border-red-900 transition-all"
+              >
+                + APPEND_SECTION
+              </button>
             </div>
           </div>
         )}

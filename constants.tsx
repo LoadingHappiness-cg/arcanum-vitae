@@ -1,5 +1,5 @@
 
-import { Album, WordFragment, VisualItem, ArchiveItem } from './types';
+import { Album, WordFragment, VisualItem, ArchiveItem, LegalContent } from './types';
 
 export const ANCHOR_PHRASES = [
   "Art is not decoration. It is position.",
@@ -78,6 +78,64 @@ export const AI_DECLARATION = {
     "That weight remains human. Always."
   ],
   tagline: "AI-generated sound. Human meaning."
+};
+
+export const INITIAL_LEGAL_CONTENT: LegalContent = {
+  heading: "LEGAL & PRIVACY",
+  sections: [
+    {
+      id: "legal-entity",
+      title: "[ 01 :: LEGAL_ENTITY_DECLARATION ]",
+      body: [
+        "THIS DIGITAL ARTIFACT \"ARCANUM VITAE\" IS OPERATED BY:",
+        "CARLOS GAVELA",
+        "LOCATION: PORTUGAL (EU)",
+        "DATA CONTROLLER: CARLOS GAVELA",
+        "CONTACT: CONTACT@ARCANUMVITAE.COM"
+      ].join("\n")
+    },
+    {
+      id: "data-policy",
+      title: "[ 02 :: DATA_SURVEILLANCE_POLICY ]",
+      body: [
+        "GDPR / RGPD COMPLIANCE:",
+        "THIS SYSTEM OPERATES ON A \"NO-TRACK\" PHILOSOPHY."
+      ].join("\n"),
+      list: [
+        "WE DO NOT USE ANALYTICS COOKIES OR TRACKING PIXELS.",
+        "WE DO NOT COLLECT PERSONAL DATA UNLESS EXPLICITLY PROVIDED VIA CONTACT CHANNELS.",
+        "LOCAL STORAGE IS USED SOLELY FOR USER INTERFACE PREFERENCES (E.G., VOLUME, VISITED SECTIONS).",
+        "SERVER LOGS MAY RETAIN IP ADDRESSES AND USER AGENTS FOR SECURITY AND TECHNICAL DIAGNOSTICS ONLY, PURGED AUTOMATICALLY.",
+        "LEGAL BASES: CONSENT (CONTACT) AND LEGITIMATE INTEREST (SECURITY/OPERATIONS)."
+      ]
+    },
+    {
+      id: "rights",
+      title: "[ 03 :: DATA_SUBJECT_RIGHTS ]",
+      body: [
+        "YOU MAY REQUEST ACCESS, RECTIFICATION, ERASURE, RESTRICTION, OR PORTABILITY OF YOUR DATA.",
+        "YOU MAY ALSO OBJECT TO PROCESSING OR WITHDRAW CONSENT AT ANY TIME.",
+        "TO EXERCISE THESE RIGHTS, CONTACT: CONTACT@ARCANUMVITAE.COM"
+      ].join("\n")
+    },
+    {
+      id: "ip",
+      title: "[ 04 :: INTELLECTUAL_PROPERTY ]",
+      body: [
+        "ALL AUDIO, VISUAL, AND TEXTUAL CONTENT IS THE INTELLECTUAL PROPERTY OF CARLOS GAVELA UNLESS NOTED OTHERWISE.",
+        "",
+        "AI AUGMENTATION DECLARATION:",
+        "CERTAIN ELEMENTS OF THIS WORK UTILIZE GENERATIVE ALGORITHMS AS TOOLS OF EXPRESSION.",
+        "THE HUMAN ARTIST RETAINS CREATIVE DIRECTION AND OWNERSHIP OF THE FINAL OUTPUT."
+      ].join("\n")
+    },
+    {
+      id: "jurisdiction",
+      title: "[ 05 :: JURISDICTION ]",
+      body: "GOVERNED BY THE LAWS OF PORTUGAL AND THE EUROPEAN UNION."
+    }
+  ],
+  footer: "END_OF_PROTOCOL"
 };
 
 export const ARTISTIC_STATEMENT = {

@@ -67,3 +67,16 @@ export interface HumanIdentity {
   veritasName: string;
   veritasLink: string;
 }
+
+export interface LegalSection {
+  id: string;
+  title: string;
+  body: string;
+  list?: string[];
+}
+
+export interface LegalContent {
+  heading: string;
+  sections: LegalSection[];
+  footer: string;
+}

@@ -159,6 +159,22 @@ const isHumanIdentity = (value: unknown) => (
     isString(value.veritasLink)
 );
 
+const isLegalSection = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.id) &&
+    isString(value.title) &&
+    isString(value.body) &&
+    (value.list === undefined || (Array.isArray(value.list) && value.list.every(isString)))
+);
+
+const isLegalContent = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.heading) &&
+    isString(value.footer) &&
+    Array.isArray(value.sections) &&
+    value.sections.every(isLegalSection)
+);
+
 const validateData = (data: unknown) => {
     const errors: string[] = [];
     if (!isRecord(data)) {
@@ -191,6 +207,10 @@ const validateData = (data: unknown) => {
 
     if ('aiDec' in data && data.aiDec !== undefined && !isAiDeclaration(data.aiDec)) {
         errors.push('Invalid aiDec payload.');
+    }
+
+    if ('legalContent' in data && data.legalContent !== undefined && !isLegalContent(data.legalContent)) {
+        errors.push('Invalid legalContent payload.');
     }
 
     return { ok: errors.length === 0, errors };

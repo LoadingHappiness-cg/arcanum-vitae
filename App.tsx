@@ -18,7 +18,8 @@ import {
   INITIAL_HUMAN_MANIFESTO,
   INITIAL_HUMAN_IDENTITY,
   FICTION_DECLARATION as INITIAL_FICTION_DEC,
-  AI_DECLARATION as INITIAL_AI_DEC
+  AI_DECLARATION as INITIAL_AI_DEC,
+  INITIAL_LEGAL_CONTENT
 } from './constants';
 
 const App: React.FC = () => {
@@ -35,6 +36,7 @@ const App: React.FC = () => {
   const [humanIdentity, setHumanIdentity] = useState<HumanIdentity>(INITIAL_HUMAN_IDENTITY);
   const [fictionDec, setFictionDec] = useState<FictionDeclaration>(INITIAL_FICTION_DEC);
   const [aiDec, setAiDec] = useState<AiDeclaration>(INITIAL_AI_DEC);
+  const [legalContent, setLegalContent] = useState(INITIAL_LEGAL_CONTENT);
 
   useEffect(() => {
     // Fetch persisted data from server
@@ -56,6 +58,9 @@ const App: React.FC = () => {
           }
           if (Object.prototype.hasOwnProperty.call(data, 'aiDec')) {
             setAiDec(data.aiDec ?? INITIAL_AI_DEC);
+          }
+          if (Object.prototype.hasOwnProperty.call(data, 'legalContent')) {
+            setLegalContent(data.legalContent ?? INITIAL_LEGAL_CONTENT);
           }
         }
       })
@@ -87,6 +92,7 @@ const App: React.FC = () => {
       humanIdentity: newData.humanIdentity ?? humanIdentity,
       fictionDec: newData.fictionDec ?? fictionDec,
       aiDec: newData.aiDec ?? aiDec,
+      legalContent: newData.legalContent ?? legalContent,
     };
 
     setAlbums(updated.albums);
@@ -96,6 +102,7 @@ const App: React.FC = () => {
     setHumanIdentity(updated.humanIdentity);
     setFictionDec(updated.fictionDec);
     setAiDec(updated.aiDec);
+    setLegalContent(updated.legalContent);
 
     // Also keep a local backup
     localStorage.setItem('av_albums', JSON.stringify(updated.albums));
@@ -105,6 +112,7 @@ const App: React.FC = () => {
     localStorage.setItem('av_identity', JSON.stringify(updated.humanIdentity));
     localStorage.setItem('av_fiction', JSON.stringify(updated.fictionDec));
     localStorage.setItem('av_ai', JSON.stringify(updated.aiDec));
+    localStorage.setItem('av_legal', JSON.stringify(updated.legalContent));
   };
 
 
@@ -132,12 +140,12 @@ const App: React.FC = () => {
           aiDec={aiDec}
         />
       );
-      case View.LEGAL: return <LegalView />;
+      case View.LEGAL: return <LegalView legalContent={legalContent} />;
       // case View.MIRROR: return <TheMirror />; // Disabled
       case View.ARCHIVE: return <ResistanceArchive />;
       case View.ADMIN: return (
         <AdminDashboard
-          data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec }}
+          data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec, legalContent }}
           onSave={handleAdminSave}
           onExit={() => navigate(View.HOME)}
         />
@@ -185,9 +193,9 @@ const App: React.FC = () => {
         <footer className="py-20 px-6 text-center space-x-8">
           <button
             onClick={() => navigate(View.LEGAL)}
-            className="text-[8px] font-mono-machine text-stone-900 hover:text-stone-700 transition-colors tracking-[1em] uppercase group"
+            className="text-[8px] font-mono-machine text-red-600 hover-red-glow transition-colors tracking-[1em] uppercase group"
           >
-            <span className="group-hover:text-red-900 transition-colors">LEGAL</span>
+            <span className="group-hover:text-red-500 transition-colors">LEGAL</span>
           </button>
 
           <button

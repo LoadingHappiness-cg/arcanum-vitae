@@ -35,21 +35,23 @@ const Navigation: React.FC<NavProps> = ({ currentView, onNavigate }) => {
         </button>
 
         <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start md:items-center bg-black/40 backdrop-blur-md p-4 border border-stone-800/50 rounded-sm w-full md:w-auto">
-          {links.map(link => (
+          {links.map(link => {
+            const isLegal = link.value === View.LEGAL;
+            return (
             <button
               key={link.value}
               onClick={() => onNavigate(link.value)}
-              className={`relative group px-2 py-1 transition-all duration-300 ${currentView === link.value ? 'text-white' : 'text-stone-400 hover:text-white'
+              className={`relative group px-2 py-1 transition-all duration-300 ${currentView === link.value ? 'text-white' : isLegal ? 'text-red-600' : 'text-stone-400 hover:text-white'
                 }`}
             >
               <div className="flex flex-col items-end md:items-center gap-1">
-                <span className={`text-[10px] md:text-xs font-mono-machine tracking-[0.2em] font-bold uppercase transition-transform group-hover:-translate-y-0.5 ${currentView === link.value ? 'text-red-600' : ''}`}>
+                <span className={`text-[10px] md:text-xs font-mono-machine tracking-[0.2em] font-bold uppercase transition-transform group-hover:-translate-y-0.5 ${currentView === link.value ? 'text-red-600' : isLegal ? 'text-red-600 hover-red-glow' : ''}`}>
                   {link.label}
                 </span>
-                <div className={`h-[1px] bg-red-600 transition-all duration-300 ${currentView === link.value ? 'w-full' : 'w-0 group-hover:w-full'}`}></div>
+                <div className={`h-[1px] bg-red-600 transition-all duration-300 ${currentView === link.value ? 'w-full' : isLegal ? 'w-full opacity-70 group-hover:opacity-100' : 'w-0 group-hover:w-full'}`}></div>
               </div>
             </button>
-          ))}
+          )})}
         </div>
       </div>
     </nav>
