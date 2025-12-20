@@ -7,6 +7,25 @@ interface HomeViewProps {
     onEnter: () => void;
 }
 
+const HOME_GALLERY = [
+    {
+        src: '/media/images/home/manifest-01.jpg',
+        alt: 'Industrial corridor with red glow'
+    },
+    {
+        src: '/media/images/home/manifest-02.jpg',
+        alt: 'Red signal against fogged skyline'
+    },
+    {
+        src: '/media/images/home/manifest-03.jpg',
+        alt: 'Hands holding a worn tape label'
+    },
+    {
+        src: '/media/images/home/manifest-04.jpg',
+        alt: 'Concrete altar with sharp light'
+    }
+];
+
 const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter }) => {
     return (
         <div className="flex flex-col min-h-screen relative">
@@ -67,6 +86,35 @@ const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter }) => {
                                 </div>
                             </div>
                         </div>
+                    </section>
+                    <section className="pb-40 px-6 max-w-6xl mx-auto w-full">
+                        <div className="flex items-center gap-4 mb-10">
+                            <div className="h-[1px] flex-1 bg-red-900/40"></div>
+                            <span className="text-[9px] font-mono-machine text-red-600 uppercase tracking-[0.6em]">IMAGE_RELICS</span>
+                            <div className="h-[1px] flex-1 bg-red-900/40"></div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {HOME_GALLERY.map((item, index) => (
+                                <div key={item.src} className="group relative aspect-[4/3] overflow-hidden border border-stone-900 bg-black">
+                                    <img
+                                        src={item.src}
+                                        alt={item.alt}
+                                        loading="lazy"
+                                        className="w-full h-full object-cover grayscale opacity-70 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-[1200ms]"
+                                        onError={(event) => {
+                                            event.currentTarget.style.opacity = '0';
+                                        }}
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                                    <div className="absolute bottom-4 left-4 text-[8px] font-mono-machine text-stone-400 tracking-[0.4em] uppercase">
+                                        RELIC_{String(index + 1).padStart(2, '0')}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="mt-8 text-[9px] font-mono-machine text-stone-600 uppercase tracking-[0.4em] text-center">
+                            PLACE IMAGES IN `public/media/images/home/`
+                        </p>
                     </section>
                 </div>
             )}
