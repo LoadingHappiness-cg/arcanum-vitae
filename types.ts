@@ -7,7 +7,8 @@ export enum View {
   ABOUT = 'about',
   MIRROR = 'mirror',
   ARCHIVE = 'archive',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
+  LEGAL = 'legal'
 }
 
 export interface Album {

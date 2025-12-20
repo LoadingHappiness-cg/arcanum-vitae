@@ -10,6 +10,7 @@ import MusicView from './components/views/MusicView';
 import WordsView from './components/views/WordsView';
 import VisualsView from './components/views/VisualsView';
 import AboutView from './components/views/AboutView';
+import LegalView from './components/views/LegalView';
 import {
   ALBUMS as INITIAL_ALBUMS,
   FRAGMENTS as INITIAL_FRAGMENTS,
@@ -123,6 +124,7 @@ const App: React.FC = () => {
           aiDec={aiDec}
         />
       );
+      case View.LEGAL: return <LegalView />;
       // case View.MIRROR: return <TheMirror />; // Disabled
       case View.ARCHIVE: return <ResistanceArchive />;
       case View.ADMIN: return (
@@ -170,9 +172,16 @@ const App: React.FC = () => {
         {renderContent()}
       </div>
 
-      {/* Subtle Admin Entry */}
+      {/* Subtle Admin & Legal Footer */}
       {currentView !== View.ADMIN && (
-        <footer className="py-20 px-6 text-center">
+        <footer className="py-20 px-6 text-center space-x-8">
+          <button
+            onClick={() => navigate(View.LEGAL)}
+            className="text-[8px] font-mono-machine text-stone-900 hover:text-stone-700 transition-colors tracking-[1em] uppercase group"
+          >
+            <span className="group-hover:text-red-900 transition-colors">LEGAL</span>
+          </button>
+
           <button
             onClick={() => navigate(View.ADMIN)}
             className="text-[8px] font-mono-machine text-stone-900 hover:text-stone-700 transition-colors tracking-[1em] uppercase group"
