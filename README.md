@@ -15,6 +15,14 @@ View your app in AI Studio: https://ai.studio/apps/drive/1AEJ_hbZKyNIxPswwMqyoEv
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Set the `GEMINI_API_KEY` in `.env` to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Admin + API Security
+
+Set the following in your `.env` when running the server:
+
+- `ADMIN_KEY`: required passkey to unlock the admin dashboard
+- `CORS_ORIGINS`: comma-separated list of allowed origins for API access
+- `ADMIN_TOKEN_TTL_MS`: optional token lifetime in milliseconds (default: 6h)

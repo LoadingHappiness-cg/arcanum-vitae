@@ -41,14 +41,22 @@ const App: React.FC = () => {
     fetch('/api/data')
       .then(res => res.json())
       .then(data => {
-        if (data) {
-          if (data.albums) setAlbums(data.albums);
-          if (data.fragments) setFragments(data.fragments);
-          if (data.visuals) setVisuals(data.visuals);
-          if (data.humanManifesto) setHumanManifesto(data.humanManifesto);
-          if (data.humanIdentity) setHumanIdentity(data.humanIdentity);
-          if (data.fictionDec) setFictionDec(data.fictionDec);
-          if (data.aiDec) setAiDec(data.aiDec);
+        if (data && typeof data === 'object') {
+          if (Array.isArray(data.albums)) setAlbums(data.albums);
+          if (Array.isArray(data.fragments)) setFragments(data.fragments);
+          if (Array.isArray(data.visuals)) setVisuals(data.visuals);
+          if (Object.prototype.hasOwnProperty.call(data, 'humanManifesto')) {
+            setHumanManifesto(data.humanManifesto ?? '');
+          }
+          if (Object.prototype.hasOwnProperty.call(data, 'humanIdentity')) {
+            setHumanIdentity(data.humanIdentity ?? INITIAL_HUMAN_IDENTITY);
+          }
+          if (Object.prototype.hasOwnProperty.call(data, 'fictionDec')) {
+            setFictionDec(data.fictionDec ?? INITIAL_FICTION_DEC);
+          }
+          if (Object.prototype.hasOwnProperty.call(data, 'aiDec')) {
+            setAiDec(data.aiDec ?? INITIAL_AI_DEC);
+          }
         }
       })
       .catch(err => console.error("Failed to load server data:", err));
@@ -70,33 +78,33 @@ const App: React.FC = () => {
     }, 400);
   };
 
-  const handleAdminSave = async (newData: any) => {
-    setAlbums(newData.albums);
-    setFragments(newData.fragments);
-    setVisuals(newData.visuals);
-    setHumanManifesto(newData.humanManifesto);
-    setHumanIdentity(newData.humanIdentity);
-    setFictionDec(newData.fictionDec);
-    setAiDec(newData.aiDec);
+  const handleAdminSave = (newData: any) => {
+    const updated = {
+      albums: newData.albums ?? albums,
+      fragments: newData.fragments ?? fragments,
+      visuals: newData.visuals ?? visuals,
+      humanManifesto: newData.humanManifesto ?? humanManifesto,
+      humanIdentity: newData.humanIdentity ?? humanIdentity,
+      fictionDec: newData.fictionDec ?? fictionDec,
+      aiDec: newData.aiDec ?? aiDec,
+    };
 
-    // Save to server
-    try {
-      await fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newData),
-      });
-      // Also keep a local backup
-      localStorage.setItem('av_albums', JSON.stringify(newData.albums));
-      localStorage.setItem('av_fragments', JSON.stringify(newData.fragments));
-      localStorage.setItem('av_visuals', JSON.stringify(newData.visuals));
-      localStorage.setItem('av_manifesto', newData.humanManifesto);
-      localStorage.setItem('av_identity', JSON.stringify(newData.humanIdentity));
-      localStorage.setItem('av_fiction', JSON.stringify(newData.fictionDec));
-      localStorage.setItem('av_ai', JSON.stringify(newData.aiDec));
-    } catch (err) {
-      console.error("Failed to save to server:", err);
-    }
+    setAlbums(updated.albums);
+    setFragments(updated.fragments);
+    setVisuals(updated.visuals);
+    setHumanManifesto(updated.humanManifesto);
+    setHumanIdentity(updated.humanIdentity);
+    setFictionDec(updated.fictionDec);
+    setAiDec(updated.aiDec);
+
+    // Also keep a local backup
+    localStorage.setItem('av_albums', JSON.stringify(updated.albums));
+    localStorage.setItem('av_fragments', JSON.stringify(updated.fragments));
+    localStorage.setItem('av_visuals', JSON.stringify(updated.visuals));
+    localStorage.setItem('av_manifesto', updated.humanManifesto ?? '');
+    localStorage.setItem('av_identity', JSON.stringify(updated.humanIdentity));
+    localStorage.setItem('av_fiction', JSON.stringify(updated.fictionDec));
+    localStorage.setItem('av_ai', JSON.stringify(updated.aiDec));
   };
 
 

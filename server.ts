@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from "@google/genai";
 import dotenv from 'dotenv';
@@ -18,8 +19,28 @@ const DATA_PATH = path.join(__dirname, 'data', 'db.json');
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 
-app.use(cors());
-app.use(express.json());
+const defaultCorsOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+];
+const corsOrigins = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const allowedOrigins = corsOrigins.length > 0 ? corsOrigins : defaultCorsOrigins;
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(null, false);
+    }
+}));
+app.use(express.json({ limit: '2mb' }));
 
 // Serve static files from the Vite build
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -36,13 +57,162 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const API_KEY = process.env.GEMINI_API_KEY || "";
 const genAI = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
+const ADMIN_KEY = process.env.ADMIN_KEY?.trim() || '';
+const TOKEN_TTL_MS = Number(process.env.ADMIN_TOKEN_TTL_MS) || 1000 * 60 * 60 * 6;
+const tokenStore = new Map<string, number>();
+
+const pruneTokens = () => {
+    const now = Date.now();
+    for (const [token, expiresAt] of tokenStore.entries()) {
+        if (expiresAt <= now) tokenStore.delete(token);
+    }
+};
+
+const issueToken = () => {
+    const token = crypto.randomBytes(32).toString('hex');
+    tokenStore.set(token, Date.now() + TOKEN_TTL_MS);
+    return token;
+};
+
+const safeEqual = (a: string, b: string) => {
+    const aBuf = Buffer.from(a);
+    const bBuf = Buffer.from(b);
+    if (aBuf.length !== bBuf.length) return false;
+    return crypto.timingSafeEqual(aBuf, bBuf);
+};
+
+const requireAdmin: express.RequestHandler = (req, res, next) => {
+    pruneTokens();
+    const authHeader = req.get('authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : (req.get('x-admin-token') || '');
+    if (!token || !tokenStore.has(token)) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const expiresAt = tokenStore.get(token);
+    if (!expiresAt || expiresAt <= Date.now()) {
+        tokenStore.delete(token);
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    return next();
+};
 
 // Persistence Helpers
-const loadData = () => {
-    if (fs.existsSync(DATA_PATH)) {
-        return JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+    typeof value === 'object' && value !== null && !Array.isArray(value)
+);
+
+const isString = (value: unknown): value is string => typeof value === 'string';
+
+const isTrack = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.title) &&
+    isString(value.lyrics) &&
+    isString(value.story) &&
+    isString(value.audioUrl)
+);
+
+const isAlbum = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.id) &&
+    isString(value.title) &&
+    isString(value.year) &&
+    isString(value.concept) &&
+    (value.context === undefined || isString(value.context)) &&
+    isString(value.coverUrl) &&
+    Array.isArray(value.tracks) &&
+    value.tracks.every(isTrack)
+);
+
+const isFragment = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.id) &&
+    isString(value.text) &&
+    (value.source === undefined || isString(value.source))
+);
+
+const isVisual = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.id) &&
+    isString(value.url) &&
+    isString(value.title) &&
+    isString(value.description)
+);
+
+const isDeclaration = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.main) &&
+    isString(value.details)
+);
+
+const isAiDeclaration = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.main) &&
+    Array.isArray(value.body) &&
+    value.body.every(isString)
+);
+
+const isHumanIdentity = (value: unknown) => (
+    isRecord(value) &&
+    isString(value.footerQuote) &&
+    isString(value.originLabel) &&
+    isString(value.veritasName) &&
+    isString(value.veritasLink)
+);
+
+const validateData = (data: unknown) => {
+    const errors: string[] = [];
+    if (!isRecord(data)) {
+        return { ok: false, errors: ['Payload must be an object.'] };
     }
-    return null;
+
+    if (!Array.isArray(data.albums) || !data.albums.every(isAlbum)) {
+        errors.push('Invalid albums payload.');
+    }
+
+    if (!Array.isArray(data.fragments) || !data.fragments.every(isFragment)) {
+        errors.push('Invalid fragments payload.');
+    }
+
+    if (!Array.isArray(data.visuals) || !data.visuals.every(isVisual)) {
+        errors.push('Invalid visuals payload.');
+    }
+
+    if ('humanManifesto' in data && data.humanManifesto !== undefined && !isString(data.humanManifesto)) {
+        errors.push('Invalid humanManifesto payload.');
+    }
+
+    if ('humanIdentity' in data && data.humanIdentity !== undefined && !isHumanIdentity(data.humanIdentity)) {
+        errors.push('Invalid humanIdentity payload.');
+    }
+
+    if ('fictionDec' in data && data.fictionDec !== undefined && !isDeclaration(data.fictionDec)) {
+        errors.push('Invalid fictionDec payload.');
+    }
+
+    if ('aiDec' in data && data.aiDec !== undefined && !isAiDeclaration(data.aiDec)) {
+        errors.push('Invalid aiDec payload.');
+    }
+
+    return { ok: errors.length === 0, errors };
+};
+
+const loadData = () => {
+    if (!fs.existsSync(DATA_PATH)) {
+        return null;
+    }
+
+    try {
+        const parsed = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+        const validation = validateData(parsed);
+        if (!validation.ok) {
+            console.warn('Invalid persisted data ignored:', validation.errors);
+            return null;
+        }
+        return parsed;
+    } catch (error) {
+        console.error('Failed to load persisted data:', error);
+        return null;
+    }
 };
 
 const saveData = (data: any) => {
@@ -66,7 +236,11 @@ app.get('/api/data', (req, res) => {
     res.json(data); // Returns null if no data saved yet, client will use INITIAL_DATA
 });
 
-app.post('/api/save', (req, res) => {
+app.post('/api/save', requireAdmin, (req, res) => {
+    const validation = validateData(req.body);
+    if (!validation.ok) {
+        return res.status(400).json({ error: "Invalid data", details: validation.errors });
+    }
     try {
         saveData(req.body);
         res.json({ success: true });
@@ -75,7 +249,7 @@ app.post('/api/save', (req, res) => {
     }
 });
 
-app.get('/api/files/list', (req, res) => {
+app.get('/api/files/list', requireAdmin, (req, res) => {
     const { type } = req.query;
     const subDir = type === 'audio' ? 'audio' : type === 'image' ? 'images' : '';
     const dirPath = path.join(__dirname, 'public', 'media', subDir);
@@ -97,7 +271,7 @@ app.get('/api/files/list', (req, res) => {
     }
 });
 
-app.post('/api/mirror', async (req, res) => {
+app.post('/api/mirror', requireAdmin, async (req, res) => {
     if (!genAI) return res.status(500).json({ error: "API Key not configured" });
     const { input } = req.body;
 
@@ -112,7 +286,7 @@ app.post('/api/mirror', async (req, res) => {
     }
 });
 
-app.post('/api/curate', async (req, res) => {
+app.post('/api/curate', requireAdmin, async (req, res) => {
     if (!genAI) return res.status(500).json({ error: "API Key not configured" });
     const { input } = req.body;
 
@@ -124,6 +298,25 @@ app.post('/api/curate', async (req, res) => {
         console.error("Curation proxy failed:", error);
         res.status(500).json({ error: "Curation failed" });
     }
+});
+
+app.post('/api/auth', (req, res) => {
+    if (!ADMIN_KEY) {
+        return res.status(503).json({ error: "Admin key not configured" });
+    }
+    const passkey = typeof req.body?.passkey === 'string' ? req.body.passkey : '';
+    if (!passkey) {
+        return res.status(400).json({ error: "Missing passkey" });
+    }
+    if (!safeEqual(passkey, ADMIN_KEY)) {
+        return res.status(401).json({ error: "Invalid passkey" });
+    }
+    const token = issueToken();
+    res.json({ token, expiresAt: new Date(Date.now() + TOKEN_TTL_MS).toISOString() });
+});
+
+app.get('/api/auth/verify', requireAdmin, (req, res) => {
+    res.json({ ok: true });
 });
 
 // Fallback for SPA - Catch-all middleware
@@ -138,4 +331,7 @@ app.use((req, res) => {
 app.listen(port, '0.0.0.0', () => {
     console.log(`Arcanum Vitae active on http://0.0.0.0:${port}`);
     console.log(`Data storage: ${DATA_PATH}`);
+    if (!ADMIN_KEY) {
+        console.warn('ADMIN_KEY is not configured. Admin actions will be disabled.');
+    }
 });

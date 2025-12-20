@@ -23,7 +23,7 @@ const AboutView: React.FC<AboutViewProps> = ({
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-32">
                     <div className="space-y-12">
-                        <div className="p-12 border border-red-900/30 bg-stone-950/40 backdrop-blur-sm relative overflow-hidden red-pulse-border">
+                        <div className="p-6 md:p-12 border border-red-900/30 bg-stone-950/40 backdrop-blur-sm relative overflow-hidden red-pulse-border">
                             <div className="scanline-red opacity-10"></div>
                             <h3 className="text-red-600 font-mono-machine text-[10px] tracking-[0.5em] uppercase mb-8 underline decoration-red-600">The Human-Machine Dialogue</h3>
                             <p className="text-3xl md:text-5xl font-extrabold tracking-tightest uppercase leading-none text-stone-100 italic mb-8">
@@ -40,7 +40,7 @@ const AboutView: React.FC<AboutViewProps> = ({
                     </div>
 
                     <div className="space-y-12">
-                        <div className="p-12 border border-stone-900 bg-black relative">
+                        <div className="p-6 md:p-12 border border-stone-900 bg-black relative">
                             <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-[0.5em] uppercase mb-8">Ontological Status</h3>
                             <p className="text-2xl font-serif-brutal text-stone-300 italic leading-relaxed mb-8">
                                 {fictionDec.details}

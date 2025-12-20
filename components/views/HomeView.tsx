@@ -23,7 +23,7 @@ const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter }) => {
                 </div>
                 <div className="absolute inset-0 z-[1] grain-overlay opacity-[0.06] pointer-events-none"></div>
                 <div className="relative z-10 flex flex-col items-center max-w-screen-2xl quantum-leap">
-                    <p className="font-mono-machine text-[10px] tracking-[0.8em] text-red-600 uppercase mb-8 fade-in">
+                    <p className="font-mono-machine text-[10px] tracking-[0.4em] sm:tracking-[0.8em] text-red-600 uppercase mb-8 fade-in">
                         [ POSITION_DECLARED ]
                     </p>
                     <h1 className="text-[15vw] md:text-[18vw] font-extrabold tracking-tightest leading-[0.75] mb-8 fade-in glitch-text text-white quantum-leap">
@@ -38,7 +38,7 @@ const HomeView: React.FC<HomeViewProps> = ({ isEntered, onEnter }) => {
                         <div className="mt-20 group relative">
                             <button
                                 onClick={onEnter}
-                                className="relative z-10 px-24 py-6 border border-stone-800 hover:border-red-600 text-stone-100 hover:text-white transition-all duration-700 font-syne font-extrabold tracking-[0.6em] text-[10px] bg-black/40 backdrop-blur-xl overflow-hidden uppercase brutal-hover"
+                                className="relative z-10 px-10 sm:px-24 py-6 border border-stone-800 hover:border-red-600 text-stone-100 hover:text-white transition-all duration-700 font-syne font-extrabold tracking-[0.3em] sm:tracking-[0.6em] text-[10px] bg-black/40 backdrop-blur-xl overflow-hidden uppercase brutal-hover"
                             >
                                 <span className="relative z-20">Enter the Fracture</span>
                                 <div className="absolute inset-0 bg-red-700 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-in-out"></div>

@@ -11,7 +11,7 @@ const WordsView: React.FC<WordsViewProps> = ({ fragments }) => {
     return (
         <div className="pt-32 pb-20 px-6 max-w-5xl mx-auto view-transition">
             <h2 className="text-6xl md:text-[10rem] font-extrabold tracking-tightest mb-20 uppercase leading-none text-white">Words</h2>
-            <div className="mb-40 p-12 border border-red-900/20 bg-stone-950/30 backdrop-blur-sm relative overflow-hidden red-pulse-border">
+            <div className="mb-40 p-6 md:p-12 border border-red-900/20 bg-stone-950/30 backdrop-blur-sm relative overflow-hidden red-pulse-border">
                 <div className="scanline-red opacity-10"></div>
                 <h3 className="font-mono-machine text-[10px] text-red-600 uppercase tracking-[0.4em] mb-8">Artifact Declaration</h3>
                 <p className="text-3xl md:text-5xl font-bold tracking-tightest mb-8 leading-none uppercase reveal-mask text-white">{FICTION_DECLARATION.main}</p>

@@ -19,7 +19,7 @@ const Navigation: React.FC<NavProps> = ({ currentView, onNavigate }) => {
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 pointer-events-none p-6 md:p-8">
-      <div className="flex justify-between items-start pointer-events-auto max-w-[1920px] mx-auto bg-gradient-to-b from-black/80 to-transparent pb-12">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 pointer-events-auto max-w-[1920px] mx-auto bg-gradient-to-b from-black/80 to-transparent pb-12">
         <button
           onClick={() => onNavigate(View.HOME)}
           className="group relative"
@@ -33,7 +33,7 @@ const Navigation: React.FC<NavProps> = ({ currentView, onNavigate }) => {
           </div>
         </button>
 
-        <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-end md:items-center bg-black/40 backdrop-blur-md p-4 border border-stone-800/50 rounded-sm">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start md:items-center bg-black/40 backdrop-blur-md p-4 border border-stone-800/50 rounded-sm w-full md:w-auto">
           {links.map(link => (
             <button
               key={link.value}

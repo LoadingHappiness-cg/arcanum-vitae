@@ -95,13 +95,13 @@ const BandPortraits: React.FC = () => {
   return (
     <div className="py-20 border-t border-stone-900 view-transition relative">
       <div className="scanline-red opacity-5"></div>
-      <div className="mb-12 flex justify-between items-end">
+      <div className="mb-12 flex flex-col md:flex-row md:justify-between md:items-end gap-6">
         <div>
           <h3 className="text-red-900 font-mono-machine uppercase tracking-[0.5em] text-[10px] mb-2">Manifestations</h3>
           <p className="text-2xl font-extrabold tracking-tightest uppercase text-white">THE SEVEN</p>
         </div>
-        <div className="text-right max-w-xs">
-          <p className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-widest leading-relaxed border-r-2 border-red-900 pr-6">
+        <div className="text-left md:text-right max-w-xs">
+          <p className="text-stone-600 font-mono-machine text-[9px] uppercase tracking-widest leading-relaxed border-l-2 md:border-l-0 md:border-r-2 border-red-900 pl-6 md:pl-0 md:pr-6">
             Seven human artists. Seven cultures. One shared refusal to kneel.
           </p>
         </div>
@@ -142,7 +142,7 @@ const BandPortraits: React.FC = () => {
           </div>
         </div>
 
-        <div className="sticky top-40 space-y-8">
+        <div className="md:sticky md:top-40 space-y-8">
           <div className={`relative aspect-[3/4] w-full max-w-md mx-auto bg-black border transition-all duration-500 flex items-center justify-center overflow-hidden group ${loadingId ? 'border-red-600 shadow-[0_0_30px_#8B0000]' : 'border-stone-900'}`}>
             <div className="scanline-red opacity-10"></div>
             {activeMember && manifestCache[activeMember.id] ? (

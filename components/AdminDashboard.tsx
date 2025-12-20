@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity } from '../types';
+import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO } from '../constants';
 
 interface AdminDashboardProps {
   data: {
@@ -16,11 +17,23 @@ interface AdminDashboardProps {
   onExit: () => void;
 }
 
+const normalizeData = (input: AdminDashboardProps['data']) => ({
+  ...input,
+  humanManifesto: input.humanManifesto ?? INITIAL_HUMAN_MANIFESTO,
+  humanIdentity: { ...INITIAL_HUMAN_IDENTITY, ...(input.humanIdentity ?? {}) },
+  fictionDec: { ...FICTION_DECLARATION, ...(input.fictionDec ?? {}) },
+  aiDec: { ...AI_DECLARATION, ...(input.aiDec ?? {}) }
+});
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authToken, setAuthToken] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return sessionStorage.getItem('av_admin_token') || '';
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(authToken));
   const [passkey, setPasskey] = useState('');
   const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'SYSTEM'>('SOUNDS');
-  const [localData, setLocalData] = useState(data);
+  const [localData, setLocalData] = useState(() => normalizeData(data));
   const [nodeInfo, setNodeInfo] = useState({
     identifier: 'AV-NODE-01',
     uptime: '00:00:00',
@@ -30,6 +43,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
 
   const [browserSelection, setBrowserSelection] = useState<{ type: 'audio' | 'image', ai: number, ti?: number, vi?: number } | null>(null);
   const [availableFiles, setAvailableFiles] = useState<{ name: string, url: string }[]>([]);
+
+  const clearAuth = () => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('av_admin_token');
+    }
+    setAuthToken('');
+    setIsAuthenticated(false);
+  };
+
+  const authFetch = async (input: RequestInfo | URL, init: RequestInit = {}) => {
+    if (!authToken) {
+      clearAuth();
+      throw new Error('MISSING_AUTH');
+    }
+    const headers = new Headers(init.headers);
+    headers.set('Authorization', `Bearer ${authToken}`);
+    const response = await fetch(input, { ...init, headers });
+    if (response.status === 401) {
+      clearAuth();
+      throw new Error('UNAUTHORIZED');
+    }
+    return response;
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -42,14 +78,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
     }
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    if (!authToken) return;
+    authFetch('/api/auth/verify')
+      .then(() => setIsAuthenticated(true))
+      .catch(() => {
+        clearAuth();
+      });
+  }, [authToken]);
+
   const openFileBrowser = async (type: 'audio' | 'image', ai: number, ti?: number, vi?: number) => {
     setBrowserSelection({ type, ai, ti, vi });
     try {
-      const res = await fetch(`/api/files/list?type=${type}`);
+      const res = await authFetch(`/api/files/list?type=${type}`);
+      if (!res.ok) {
+        throw new Error('FILE_LIST_FAILED');
+      }
       const files = await res.json();
       setAvailableFiles(files);
     } catch (err) {
       console.error("Failed to fetch files:", err);
+      alert('ACCESS_DENIED: AUTH_REQUIRED');
     }
   };
 
@@ -74,18 +123,51 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
     setBrowserSelection(null);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (passkey.toUpperCase() === 'VERITAS') {
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passkey })
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || !payload.token) {
+        throw new Error(payload.error || 'INVALID_MANIFEST_KEY');
+      }
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('av_admin_token', payload.token);
+      }
+      setAuthToken(payload.token);
       setIsAuthenticated(true);
-    } else {
+      setPasskey('');
+    } catch (error) {
+      console.error('Admin auth failed:', error);
       alert('ACCESS_DENIED: INVALID_MANIFEST_KEY');
     }
   };
 
-  const handleSave = () => {
-    onSave(localData);
-    alert('MANIFEST_UPDATED: CHANGES_COMMITTED_TO_BONE');
+  const handleSave = async () => {
+    try {
+      const res = await authFetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(localData),
+      });
+      if (!res.ok) {
+        throw new Error('SAVE_FAILED');
+      }
+      onSave(localData);
+      alert('MANIFEST_UPDATED: CHANGES_COMMITTED_TO_BONE');
+    } catch (error) {
+      console.error('Save failed:', error);
+      alert('SAVE_FAILED: AUTH_OR_SERVER_ERROR');
+    }
+  };
+
+  const handleExit = () => {
+    clearAuth();
+    onExit();
   };
 
   if (!isAuthenticated) {
@@ -119,13 +201,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
   }
 
   return (
-    <div className="min-h-screen pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col view-transition">
+    <div className="min-h-screen pt-32 md:pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col view-transition">
       <div className="scanline-red opacity-10"></div>
 
-      <div className="flex justify-between items-end mb-20">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-8 mb-16 md:mb-20">
         <div>
           <h2 className="text-4xl md:text-6xl font-extrabold tracking-tightest uppercase text-white mb-4">COMMAND_CENTER</h2>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'SYSTEM'].map((tab) => (
               <button
                 key={tab}
@@ -138,7 +220,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
             ))}
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <button
             onClick={handleSave}
             className="px-8 py-3 bg-red-600 text-black font-syne font-bold text-[10px] tracking-widest uppercase brutal-hover red-pulse-border"
@@ -146,7 +228,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
             COMMIT CHANGES
           </button>
           <button
-            onClick={onExit}
+            onClick={handleExit}
             className="px-8 py-3 border border-stone-800 text-stone-600 font-syne font-bold text-[10px] tracking-widest uppercase hover:text-white hover:border-white transition-all"
           >
             DISCONNECT

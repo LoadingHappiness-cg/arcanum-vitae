@@ -29,7 +29,7 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
 
             <div className="mb-32 fade-in">
                 <h2 className="text-6xl md:text-[14vw] font-extrabold tracking-tightest mb-10 leading-none uppercase text-white quantum-leap">Sounds</h2>
-                <div className="max-w-5xl p-12 border border-red-900/30 bg-stone-950/40 mb-20 backdrop-blur-sm relative overflow-hidden red-pulse-border">
+                <div className="max-w-5xl p-6 md:p-12 border border-red-900/30 bg-stone-950/40 mb-20 backdrop-blur-sm relative overflow-hidden red-pulse-border">
                     <div className="scanline-red opacity-10"></div>
                     <p className="text-red-600 font-mono-machine text-[10px] tracking-[0.5em] uppercase mb-8 underline decoration-red-600">ALBUM MANIFESTO: {albums[0]?.title || 'UNTITLED'}</p>
                     <div className="space-y-12">
@@ -54,7 +54,7 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 items-start mb-24 pb-24 border-b border-stone-900">
                             {/* Sticky Left Sidebar with Album Info & Track Index */}
                             {/* self-start is CRITICAL for sticky to work in a grid item! */}
-                            <div className="lg:col-span-1 sticky top-40 self-start stagger-item max-h-[90vh] overflow-y-auto custom-scrollbar pr-4">
+                            <div className="lg:col-span-1 lg:sticky lg:top-40 self-start stagger-item max-h-[90vh] overflow-y-auto custom-scrollbar pr-4">
                                 <div className="relative group mb-8 overflow-hidden brutal-border hover:border-red-600 transition-colors bg-stone-900">
                                     <img
                                         src={album.coverUrl || 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800&h=800&auto=format&fit=crop'}
