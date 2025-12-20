@@ -420,9 +420,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                         />
                         <button
                           onClick={() => openFileBrowser('audio', ai, ti)}
-                          className="px-3 bg-stone-900 text-[8px] font-mono-machine text-stone-500 hover:text-white"
+                          className="px-4 border border-stone-800 text-[10px] font-mono-machine text-red-600 hover:bg-red-600 hover:text-black transition-colors"
                         >
-                          BROWSE
+                          [ BROWSE ]
                         </button>
                       </div>
                     </div>
