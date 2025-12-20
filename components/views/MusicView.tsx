@@ -8,6 +8,8 @@ interface MusicViewProps {
 }
 
 const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
+    const [currentPlayingId, setCurrentPlayingId] = React.useState<string | number | null>(null);
+
     return (
         <div className="pt-32 pb-40 px-6 max-w-7xl mx-auto view-transition">
             <div className="mb-32 fade-in">
@@ -50,9 +52,18 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
 
                             <div className="lg:col-span-2">
                                 <div className="flex flex-col gap-0">
-                                    {album.tracks.map((track, ti) => (
-                                        <AudioPlayer key={track.id || ti} track={track} index={ti} />
-                                    ))}
+                                    {album.tracks.map((track, ti) => {
+                                        const uniqueId = track.id || `${album.id}-${ti}`;
+                                        return (
+                                            <AudioPlayer
+                                                key={uniqueId}
+                                                track={track}
+                                                index={ti}
+                                                isCurrentTrack={currentPlayingId === uniqueId}
+                                                onPlayRequest={() => setCurrentPlayingId(uniqueId)}
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

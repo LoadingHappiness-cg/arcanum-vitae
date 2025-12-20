@@ -12,9 +12,11 @@ const formatTime = (seconds: number) => {
 interface AudioPlayerProps {
   track: Track;
   index: number;
+  isCurrentTrack?: boolean;
+  onPlayRequest?: () => void;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack = false, onPlayRequest }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -22,16 +24,27 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // Pause if another track takes focus
+  React.useEffect(() => {
+    if (!isCurrentTrack && isPlaying) {
+      if (audioRef.current) audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, [isCurrentTrack]);
+
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
     } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
+      // Notify parent to stop others before we start
+      if (onPlayRequest) onPlayRequest();
 
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
   const handleTimeUpdate = () => {
     if (!audioRef.current) return;
     const cur = audioRef.current.currentTime;
@@ -57,12 +70,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index }) => {
   };
 
   return (
-    <div 
-      className={`group border ${isPlaying ? 'red-pulse-border border-red-600/50 bg-red-900/5 shadow-[inset_0_0_40px_rgba(139,0,0,0.1)]' : 'border-stone-900 hover:border-stone-800 bg-stone-950/10'} p-8 md:p-12 mb-12 stagger-item transition-all duration-1000 relative overflow-hidden`} 
+    <div
+      className={`group border ${isPlaying ? 'red-pulse-border border-red-600/50 bg-red-900/5 shadow-[inset_0_0_40px_rgba(139,0,0,0.1)]' : 'border-stone-900 hover:border-stone-800 bg-stone-950/10'} p-8 md:p-12 mb-12 stagger-item transition-all duration-1000 relative overflow-hidden`}
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <div className="scanline-red opacity-[0.03]"></div>
-      
+
       <div className="absolute top-0 right-0 p-4 flex gap-3 pointer-events-none">
         <span className="text-[7px] font-mono-machine text-red-600 uppercase tracking-[0.5em] opacity-40 group-hover:opacity-100 transition-opacity">[ PCM_RAW ]</span>
         <span className="text-[7px] font-mono-machine text-stone-800 uppercase tracking-[0.5em]">[ AES_ENCRYPTED ]</span>
@@ -74,19 +87,25 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index }) => {
             <span className={`font-mono-machine text-[10px] tracking-widest uppercase transition-colors ${isPlaying ? 'text-red-500' : 'text-stone-600'}`}>
               [ {isPlaying ? 'SENSING_SIGNAL' : 'IDLE_MANIFEST'} ]
             </span>
-            <span className="text-stone-800 font-mono-machine text-[9px]">• 24BIT_DEPTH •</span>
-            {isPlaying && <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>}
+            {isPlaying && (
+              <div className="spectrum-container">
+                {[...Array(12)].map((_, i) => (
+                  <div key={i} className="spectrum-bar" style={{ animationDelay: `${i * 0.05}s`, animationDuration: `${0.4 + Math.random() * 0.4}s` }}></div>
+                ))}
+              </div>
+            )}
+            {!isPlaying && <span className="text-stone-800 font-mono-machine text-[9px]">• 24BIT_DEPTH •</span>}
           </div>
           <h4 className={`text-3xl md:text-5xl font-extrabold tracking-tightest uppercase transition-colors leading-none ${isPlaying ? 'text-red-600' : 'text-stone-300 group-hover:text-white'}`}>
             {track.title}
           </h4>
         </div>
-        
-        <button 
+
+        <button
           onClick={togglePlay}
-          className={`px-10 py-4 border transition-all font-syne font-bold text-[10px] tracking-[0.4em] uppercase bg-black min-w-[160px] brutal-hover ${isPlaying ? 'border-red-600 text-white shadow-[0_0_20px_rgba(255,0,0,0.2)]' : 'border-stone-800 text-stone-400 hover:border-red-600 hover:text-white'}`}
+          className={`btn-activate px-12 py-5 border transition-all font-syne font-bold text-[10px] tracking-[0.4em] uppercase min-w-[160px] ${isPlaying ? 'border-red-600 bg-transparent text-white' : 'border-stone-800 text-stone-400 bg-stone-950 hover:border-red-600'}`}
         >
-          {isPlaying ? 'SUSPEND' : 'ACTIVATE'}
+          <span>{isPlaying ? 'SUSPEND' : 'ACTIVATE'}</span>
         </button>
       </div>
 
@@ -94,12 +113,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index }) => {
         <span className={`font-mono-machine text-[10px] w-12 transition-colors ${isPlaying ? 'text-red-500' : 'text-stone-600'}`}>
           {formatTime(currentTime)}
         </span>
-        <div 
+        <div
           ref={progressContainerRef}
           onClick={handleSeek}
           className="relative flex-1 h-[4px] bg-stone-900 overflow-hidden cursor-pointer group/seek"
         >
-          <div 
+          <div
             className={`absolute top-0 left-0 h-full transition-all duration-150 ease-linear z-10 ${isPlaying ? 'bg-red-600 shadow-[0_0_15px_rgba(255,0,0,0.8)]' : 'bg-stone-600'}`}
             style={{ width: `${progress}%` }}
           ></div>
@@ -141,9 +160,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index }) => {
         </div>
       </div>
 
-      <audio 
-        ref={audioRef} 
-        src={track.audioUrl} 
+      <audio
+        ref={audioRef}
+        src={track.audioUrl}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={() => setIsPlaying(false)}
