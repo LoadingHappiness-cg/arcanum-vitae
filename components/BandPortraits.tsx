@@ -143,7 +143,7 @@ const BandPortraits: React.FC = () => {
         </div>
 
         <div className="sticky top-40 space-y-8">
-          <div className={`relative aspect-square bg-black border transition-all duration-500 flex items-center justify-center overflow-hidden group ${loadingId ? 'border-red-600 shadow-[0_0_30px_#8B0000]' : 'border-stone-900'}`}>
+          <div className={`relative aspect-[3/4] w-full max-w-md mx-auto bg-black border transition-all duration-500 flex items-center justify-center overflow-hidden group ${loadingId ? 'border-red-600 shadow-[0_0_30px_#8B0000]' : 'border-stone-900'}`}>
             <div className="scanline-red opacity-10"></div>
             {activeMember && manifestCache[activeMember.id] ? (
               <div className="relative w-full h-full quantum-leap">
