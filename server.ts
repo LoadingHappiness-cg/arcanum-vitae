@@ -187,6 +187,18 @@ const isHomeContent = (value: unknown) => (
     ))
 );
 
+const isAnalyticsContent = (value: unknown) => (
+    isRecord(value) &&
+    isRecord(value.umami) &&
+    typeof value.umami.enabled === 'boolean' &&
+    isString(value.umami.websiteId) &&
+    isString(value.umami.srcUrl) &&
+    (value.umami.domains === undefined || isString(value.umami.domains)) &&
+    isRecord(value.googleAnalytics) &&
+    typeof value.googleAnalytics.enabled === 'boolean' &&
+    isString(value.googleAnalytics.measurementId)
+);
+
 const validateData = (data: unknown) => {
     const errors: string[] = [];
     if (!isRecord(data)) {
@@ -227,6 +239,10 @@ const validateData = (data: unknown) => {
 
     if ('homeContent' in data && data.homeContent !== undefined && !isHomeContent(data.homeContent)) {
         errors.push('Invalid homeContent payload.');
+    }
+
+    if ('analyticsContent' in data && data.analyticsContent !== undefined && !isAnalyticsContent(data.analyticsContent)) {
+        errors.push('Invalid analyticsContent payload.');
     }
 
     return { ok: errors.length === 0, errors };

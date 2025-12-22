@@ -1,5 +1,5 @@
 
-import { Album, WordFragment, VisualItem, ArchiveItem, LegalContent, HomeContent } from './types';
+import { Album, WordFragment, VisualItem, ArchiveItem, LegalContent, HomeContent, AnalyticsContent } from './types';
 
 export const ANCHOR_PHRASES = [
   "Art is not decoration. It is position.",
@@ -166,6 +166,19 @@ export const INITIAL_HOME_CONTENT: HomeContent = {
       manifesto: "WE WALK THE CORRIDOR, UNBOWED."
     }
   ]
+};
+
+export const INITIAL_ANALYTICS_CONTENT: AnalyticsContent = {
+  umami: {
+    enabled: false,
+    websiteId: '',
+    srcUrl: 'https://cloud.umami.is/script.js',
+    domains: ''
+  },
+  googleAnalytics: {
+    enabled: false,
+    measurementId: ''
+  }
 };
 
 export const ARTISTIC_STATEMENT = {

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity, LegalContent, HomeContent } from '../types';
-import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO, INITIAL_LEGAL_CONTENT, INITIAL_HOME_CONTENT } from '../constants';
+import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity, LegalContent, HomeContent, AnalyticsContent } from '../types';
+import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO, INITIAL_LEGAL_CONTENT, INITIAL_HOME_CONTENT, INITIAL_ANALYTICS_CONTENT } from '../constants';
 
 interface AdminDashboardProps {
   data: {
@@ -14,6 +14,7 @@ interface AdminDashboardProps {
     aiDec?: AiDeclaration;
     legalContent?: LegalContent;
     homeContent?: HomeContent;
+    analyticsContent?: AnalyticsContent;
   };
   onSave: (newData: any) => void;
   onExit: () => void;
@@ -26,7 +27,8 @@ const normalizeData = (input: AdminDashboardProps['data']) => ({
   fictionDec: { ...FICTION_DECLARATION, ...(input.fictionDec ?? {}) },
   aiDec: { ...AI_DECLARATION, ...(input.aiDec ?? {}) },
   legalContent: input.legalContent ?? INITIAL_LEGAL_CONTENT,
-  homeContent: input.homeContent ?? INITIAL_HOME_CONTENT
+  homeContent: input.homeContent ?? INITIAL_HOME_CONTENT,
+  analyticsContent: input.analyticsContent ?? INITIAL_ANALYTICS_CONTENT
 });
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit }) => {
@@ -36,7 +38,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
   });
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(authToken));
   const [passkey, setPasskey] = useState('');
-  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'HOME' | 'LEGAL' | 'SYSTEM'>('SOUNDS');
+  const [activeTab, setActiveTab] = useState<'SOUNDS' | 'WORDS' | 'VISUALS' | 'ABOUT' | 'HOME' | 'LEGAL' | 'ANALYTICS' | 'SYSTEM'>('SOUNDS');
   const [localData, setLocalData] = useState(() => normalizeData(data));
   const [nodeInfo, setNodeInfo] = useState({
     identifier: 'AV-NODE-01',
@@ -212,7 +214,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
         <div>
           <h2 className="text-4xl md:text-6xl font-extrabold tracking-tightest uppercase text-white mb-4">COMMAND_CENTER</h2>
           <div className="flex flex-wrap gap-4">
-            {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'HOME', 'LEGAL', 'SYSTEM'].map((tab) => (
+            {['SOUNDS', 'WORDS', 'VISUALS', 'ABOUT', 'HOME', 'LEGAL', 'ANALYTICS', 'SYSTEM'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -590,6 +592,94 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
               >
                 + APPEND_SECTION
               </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'ANALYTICS' && localData.analyticsContent && (
+          <div className="space-y-12">
+            <div className="p-8 border border-stone-900 bg-black/40 space-y-6">
+              <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase">UMAMI</h3>
+              <label className="flex items-center gap-3 text-stone-500 font-mono-machine text-[10px] uppercase">
+                <input
+                  type="checkbox"
+                  checked={localData.analyticsContent.umami.enabled}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    analyticsContent: {
+                      ...localData.analyticsContent!,
+                      umami: { ...localData.analyticsContent!.umami, enabled: e.target.checked }
+                    }
+                  })}
+                />
+                ENABLE UMAMI
+              </label>
+              <input
+                className="w-full bg-black border border-stone-800 p-3 text-stone-300 font-mono-machine text-[10px] uppercase tracking-widest"
+                value={localData.analyticsContent.umami.websiteId}
+                onChange={(e) => setLocalData({
+                  ...localData,
+                  analyticsContent: {
+                    ...localData.analyticsContent!,
+                    umami: { ...localData.analyticsContent!.umami, websiteId: e.target.value }
+                  }
+                })}
+                placeholder="UMAMI_WEBSITE_ID"
+              />
+              <input
+                className="w-full bg-black border border-stone-800 p-3 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
+                value={localData.analyticsContent.umami.srcUrl}
+                onChange={(e) => setLocalData({
+                  ...localData,
+                  analyticsContent: {
+                    ...localData.analyticsContent!,
+                    umami: { ...localData.analyticsContent!.umami, srcUrl: e.target.value }
+                  }
+                })}
+                placeholder="UMAMI_SCRIPT_URL"
+              />
+              <input
+                className="w-full bg-black border border-stone-800 p-3 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
+                value={localData.analyticsContent.umami.domains || ''}
+                onChange={(e) => setLocalData({
+                  ...localData,
+                  analyticsContent: {
+                    ...localData.analyticsContent!,
+                    umami: { ...localData.analyticsContent!.umami, domains: e.target.value }
+                  }
+                })}
+                placeholder="UMAMI_DOMAINS (OPTIONAL)"
+              />
+            </div>
+
+            <div className="p-8 border border-stone-900 bg-black/40 space-y-6">
+              <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase">GOOGLE_ANALYTICS</h3>
+              <label className="flex items-center gap-3 text-stone-500 font-mono-machine text-[10px] uppercase">
+                <input
+                  type="checkbox"
+                  checked={localData.analyticsContent.googleAnalytics.enabled}
+                  onChange={(e) => setLocalData({
+                    ...localData,
+                    analyticsContent: {
+                      ...localData.analyticsContent!,
+                      googleAnalytics: { ...localData.analyticsContent!.googleAnalytics, enabled: e.target.checked }
+                    }
+                  })}
+                />
+                ENABLE GA4
+              </label>
+              <input
+                className="w-full bg-black border border-stone-800 p-3 text-stone-300 font-mono-machine text-[10px] uppercase tracking-widest"
+                value={localData.analyticsContent.googleAnalytics.measurementId}
+                onChange={(e) => setLocalData({
+                  ...localData,
+                  analyticsContent: {
+                    ...localData.analyticsContent!,
+                    googleAnalytics: { ...localData.analyticsContent!.googleAnalytics, measurementId: e.target.value }
+                  }
+                })}
+                placeholder="GA_MEASUREMENT_ID"
+              />
             </div>
           </div>
         )}

@@ -89,3 +89,16 @@ export interface HomeContent {
     manifesto: string;
   }[];
 }
+
+export interface AnalyticsContent {
+  umami: {
+    enabled: boolean;
+    websiteId: string;
+    srcUrl: string;
+    domains?: string;
+  };
+  googleAnalytics: {
+    enabled: boolean;
+    measurementId: string;
+  };
+}

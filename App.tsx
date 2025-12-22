@@ -20,7 +20,8 @@ import {
   FICTION_DECLARATION as INITIAL_FICTION_DEC,
   AI_DECLARATION as INITIAL_AI_DEC,
   INITIAL_LEGAL_CONTENT,
-  INITIAL_HOME_CONTENT
+  INITIAL_HOME_CONTENT,
+  INITIAL_ANALYTICS_CONTENT
 } from './constants';
 
 const App: React.FC = () => {
@@ -39,6 +40,50 @@ const App: React.FC = () => {
   const [aiDec, setAiDec] = useState<AiDeclaration>(INITIAL_AI_DEC);
   const [legalContent, setLegalContent] = useState(INITIAL_LEGAL_CONTENT);
   const [homeContent, setHomeContent] = useState(INITIAL_HOME_CONTENT);
+  const [analyticsContent, setAnalyticsContent] = useState(INITIAL_ANALYTICS_CONTENT);
+
+  const applyAnalyticsScripts = () => {
+    if (typeof document === 'undefined') return;
+
+    const removeById = (id: string) => {
+      const existing = document.getElementById(id);
+      if (existing) existing.remove();
+    };
+
+    removeById('umami-script');
+    removeById('ga-script');
+    removeById('ga-inline');
+
+    if (analyticsContent.umami.enabled && analyticsContent.umami.websiteId) {
+      const script = document.createElement('script');
+      script.id = 'umami-script';
+      script.defer = true;
+      script.src = analyticsContent.umami.srcUrl || 'https://cloud.umami.is/script.js';
+      script.setAttribute('data-website-id', analyticsContent.umami.websiteId);
+      if (analyticsContent.umami.domains) {
+        script.setAttribute('data-domains', analyticsContent.umami.domains);
+      }
+      document.head.appendChild(script);
+    }
+
+    if (analyticsContent.googleAnalytics.enabled && analyticsContent.googleAnalytics.measurementId) {
+      const gaScript = document.createElement('script');
+      gaScript.id = 'ga-script';
+      gaScript.async = true;
+      gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${analyticsContent.googleAnalytics.measurementId}`;
+      document.head.appendChild(gaScript);
+
+      const inline = document.createElement('script');
+      inline.id = 'ga-inline';
+      inline.text = `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '${analyticsContent.googleAnalytics.measurementId}');
+      `;
+      document.head.appendChild(inline);
+    }
+  };
 
   const hydrateFromLocalStorage = () => {
     if (typeof window === 'undefined') return;
@@ -52,6 +97,7 @@ const App: React.FC = () => {
       const storedAi = localStorage.getItem('av_ai');
       const storedLegal = localStorage.getItem('av_legal');
       const storedHome = localStorage.getItem('av_home');
+      const storedAnalytics = localStorage.getItem('av_analytics');
 
       if (storedAlbums) setAlbums(JSON.parse(storedAlbums));
       if (storedFragments) setFragments(JSON.parse(storedFragments));
@@ -62,6 +108,7 @@ const App: React.FC = () => {
       if (storedAi) setAiDec(JSON.parse(storedAi));
       if (storedLegal) setLegalContent(JSON.parse(storedLegal));
       if (storedHome) setHomeContent(JSON.parse(storedHome));
+      if (storedAnalytics) setAnalyticsContent(JSON.parse(storedAnalytics));
     } catch (error) {
       console.error('Failed to hydrate from local storage:', error);
     }
@@ -94,6 +141,9 @@ const App: React.FC = () => {
           if (Object.prototype.hasOwnProperty.call(data, 'homeContent')) {
             setHomeContent(data.homeContent ?? INITIAL_HOME_CONTENT);
           }
+          if (Object.prototype.hasOwnProperty.call(data, 'analyticsContent')) {
+            setAnalyticsContent(data.analyticsContent ?? INITIAL_ANALYTICS_CONTENT);
+          }
         } else {
           hydrateFromLocalStorage();
         }
@@ -111,6 +161,10 @@ const App: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentView]);
+
+  useEffect(() => {
+    applyAnalyticsScripts();
+  }, [analyticsContent]);
 
   const navigate = (view: View) => {
     setIsTransitioning(true);
@@ -131,6 +185,7 @@ const App: React.FC = () => {
       aiDec: newData.aiDec ?? aiDec,
       legalContent: newData.legalContent ?? legalContent,
       homeContent: newData.homeContent ?? homeContent,
+      analyticsContent: newData.analyticsContent ?? analyticsContent,
     };
 
     setAlbums(updated.albums);
@@ -142,6 +197,7 @@ const App: React.FC = () => {
     setAiDec(updated.aiDec);
     setLegalContent(updated.legalContent);
     setHomeContent(updated.homeContent);
+    setAnalyticsContent(updated.analyticsContent);
 
     // Also keep a local backup
     localStorage.setItem('av_albums', JSON.stringify(updated.albums));
@@ -153,6 +209,7 @@ const App: React.FC = () => {
     localStorage.setItem('av_ai', JSON.stringify(updated.aiDec));
     localStorage.setItem('av_legal', JSON.stringify(updated.legalContent));
     localStorage.setItem('av_home', JSON.stringify(updated.homeContent));
+    localStorage.setItem('av_analytics', JSON.stringify(updated.analyticsContent));
   };
 
 
@@ -185,7 +242,7 @@ const App: React.FC = () => {
       case View.ARCHIVE: return <ResistanceArchive />;
       case View.ADMIN: return (
         <AdminDashboard
-          data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec, legalContent, homeContent }}
+          data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec, legalContent, homeContent, analyticsContent }}
           onSave={handleAdminSave}
           onExit={() => navigate(View.HOME)}
         />
