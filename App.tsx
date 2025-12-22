@@ -42,6 +42,19 @@ const App: React.FC = () => {
   const [homeContent, setHomeContent] = useState(INITIAL_HOME_CONTENT);
   const [analyticsContent, setAnalyticsContent] = useState(INITIAL_ANALYTICS_CONTENT);
 
+  const resolveUmamiScriptUrl = () => {
+    const fallback = 'https://cloud.umami.is/script.js';
+    const raw = (analyticsContent.umami.srcUrl || '').trim();
+    if (!raw) return fallback;
+    if (raw.includes('/api/send')) {
+      return raw.replace(/\/api\/send.*$/, '/script.js');
+    }
+    if (raw.endsWith('/')) {
+      return `${raw}script.js`;
+    }
+    return raw;
+  };
+
   const applyAnalyticsScripts = () => {
     if (typeof document === 'undefined') return;
 
@@ -58,7 +71,7 @@ const App: React.FC = () => {
       const script = document.createElement('script');
       script.id = 'umami-script';
       script.defer = true;
-      script.src = analyticsContent.umami.srcUrl || 'https://cloud.umami.is/script.js';
+      script.src = resolveUmamiScriptUrl();
       script.setAttribute('data-website-id', analyticsContent.umami.websiteId);
       if (analyticsContent.umami.domains) {
         script.setAttribute('data-domains', analyticsContent.umami.domains);

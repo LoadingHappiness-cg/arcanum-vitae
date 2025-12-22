@@ -31,6 +31,18 @@ const normalizeData = (input: AdminDashboardProps['data']) => ({
   analyticsContent: input.analyticsContent ?? INITIAL_ANALYTICS_CONTENT
 });
 
+const normalizeUmamiScriptUrl = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  if (trimmed.includes('/api/send')) {
+    return trimmed.replace(/\/api\/send.*$/, '/script.js');
+  }
+  if (trimmed.endsWith('/')) {
+    return `${trimmed}script.js`;
+  }
+  return trimmed;
+};
+
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit }) => {
   const [authToken, setAuthToken] = useState(() => {
     if (typeof window === 'undefined') return '';
@@ -49,6 +61,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
 
   const [browserSelection, setBrowserSelection] = useState<{ type: 'audio' | 'image', ai: number, ti?: number, vi?: number } | null>(null);
   const [availableFiles, setAvailableFiles] = useState<{ name: string, url: string }[]>([]);
+  const umamiRawUrl = localData.analyticsContent?.umami.srcUrl ?? '';
+  const umamiNormalizedUrl = normalizeUmamiScriptUrl(umamiRawUrl);
+  const showUmamiWarning = Boolean(umamiRawUrl.trim()) && umamiRawUrl.trim() !== umamiNormalizedUrl;
 
   const clearAuth = () => {
     if (typeof window !== 'undefined') {
@@ -638,6 +653,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                 })}
                 placeholder="UMAMI_SCRIPT_URL"
               />
+              {showUmamiWarning && (
+                <div className="flex items-center justify-between gap-4 text-[10px] font-mono-machine uppercase tracking-widest text-amber-400">
+                  <span>UMAMI SCRIPT URL LOOKS INVALID. TRY {umamiNormalizedUrl}</span>
+                  <button
+                    onClick={() => setLocalData({
+                      ...localData,
+                      analyticsContent: {
+                        ...localData.analyticsContent!,
+                        umami: { ...localData.analyticsContent!.umami, srcUrl: umamiNormalizedUrl }
+                      }
+                    })}
+                    className="px-3 py-2 border border-amber-600 text-amber-300 hover:text-amber-200 hover:border-amber-400 transition-all"
+                  >
+                    FIX URL
+                  </button>
+                </div>
+              )}
               <input
                 className="w-full bg-black border border-stone-800 p-3 text-stone-500 font-mono-machine text-[10px] uppercase tracking-widest"
                 value={localData.analyticsContent.umami.domains || ''}
