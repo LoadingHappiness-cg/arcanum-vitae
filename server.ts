@@ -391,6 +391,29 @@ app.get('/umami/script.js', async (_req, res) => {
     }
 });
 
+app.post('/umami/api/send', async (req, res) => {
+    if (!UMAMI_PROXY_BASE) {
+        return res.status(503).json({ error: 'Umami proxy is not configured.' });
+    }
+    try {
+        const upstream = await fetch(`${UMAMI_PROXY_BASE}/api/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': req.get('user-agent') || ''
+            },
+            body: JSON.stringify(req.body ?? {})
+        });
+        const contentType = upstream.headers.get('content-type');
+        if (contentType) res.set('Content-Type', contentType);
+        const payload = await upstream.text();
+        return res.status(upstream.status).send(payload);
+    } catch (error) {
+        console.error('Umami send proxy failed:', error);
+        return res.status(502).json({ error: 'Umami proxy failed.' });
+    }
+});
+
 app.post('/api/send', async (req, res) => {
     if (!UMAMI_PROXY_BASE) {
         return res.status(503).json({ error: 'Umami proxy is not configured.' });
