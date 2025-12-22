@@ -18,6 +18,7 @@ const DATA_PATH = path.join(__dirname, 'data', 'db.json');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
+const UMAMI_PROXY_BASE = (process.env.UMAMI_PROXY_BASE || '').trim().replace(/\/+$/, '');
 
 const defaultCorsOrigins = [
     'http://localhost:3000',
@@ -365,6 +366,52 @@ app.post('/api/auth', (req, res) => {
     }
     const token = issueToken();
     res.json({ token, expiresAt: new Date(Date.now() + TOKEN_TTL_MS).toISOString() });
+});
+
+app.get('/umami/script.js', async (_req, res) => {
+    if (!UMAMI_PROXY_BASE) {
+        return res.status(503).send('Umami proxy is not configured.');
+    }
+    try {
+        const upstream = await fetch(`${UMAMI_PROXY_BASE}/script.js`);
+        if (!upstream.ok) {
+            return res.status(upstream.status).send('Failed to load Umami script.');
+        }
+        const contentType = upstream.headers.get('content-type') || 'application/javascript; charset=utf-8';
+        res.set('Content-Type', contentType);
+        const cacheControl = upstream.headers.get('cache-control');
+        if (cacheControl) {
+            res.set('Cache-Control', cacheControl);
+        }
+        const body = Buffer.from(await upstream.arrayBuffer());
+        return res.status(200).send(body);
+    } catch (error) {
+        console.error('Umami script proxy failed:', error);
+        return res.status(502).send('Umami proxy failed.');
+    }
+});
+
+app.post('/api/send', async (req, res) => {
+    if (!UMAMI_PROXY_BASE) {
+        return res.status(503).json({ error: 'Umami proxy is not configured.' });
+    }
+    try {
+        const upstream = await fetch(`${UMAMI_PROXY_BASE}/api/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': req.get('user-agent') || ''
+            },
+            body: JSON.stringify(req.body ?? {})
+        });
+        const contentType = upstream.headers.get('content-type');
+        if (contentType) res.set('Content-Type', contentType);
+        const payload = await upstream.text();
+        return res.status(upstream.status).send(payload);
+    } catch (error) {
+        console.error('Umami send proxy failed:', error);
+        return res.status(502).json({ error: 'Umami proxy failed.' });
+    }
 });
 
 app.get('/api/auth/verify', requireAdmin, (req, res) => {

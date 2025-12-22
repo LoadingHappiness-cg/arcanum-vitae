@@ -653,6 +653,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
                 })}
                 placeholder="UMAMI_SCRIPT_URL"
               />
+              <p className="text-stone-600 font-mono-machine text-[10px] uppercase tracking-widest">
+                TIP: USE /UMAMI/SCRIPT.JS WHEN UMAMI_PROXY_BASE IS SET.
+              </p>
               {showUmamiWarning && (
                 <div className="flex items-center justify-between gap-4 text-[10px] font-mono-machine uppercase tracking-widest text-amber-400">
                   <span>UMAMI SCRIPT URL LOOKS INVALID. TRY {umamiNormalizedUrl}</span>
