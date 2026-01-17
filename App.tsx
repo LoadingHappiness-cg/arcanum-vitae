@@ -259,7 +259,7 @@ const App: React.FC = () => {
         />
       );
       case View.LEGAL: return <LegalView legalContent={legalContent} />;
-      // case View.MIRROR: return <TheMirror trackEvent={trackEvent} />; // Disabled
+      case View.MIRROR: return <TheMirror trackEvent={trackEvent} />;
       case View.ARCHIVE: return <ResistanceArchive trackEvent={trackEvent} />;
       case View.ADMIN: return (
         <AdminDashboard

@@ -2,7 +2,11 @@
 import React, { useState } from 'react';
 import { getMirrorReflection } from '../services/gemini';
 
-const TheMirror: React.FC = () => {
+interface TheMirrorProps {
+  trackEvent?: (name: string, data?: any) => void;
+}
+
+const TheMirror: React.FC<TheMirrorProps> = ({ trackEvent }) => {
   const [input, setInput] = useState('');
   const [reflection, setReflection] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -10,8 +14,11 @@ const TheMirror: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-    
+
     setLoading(true);
+    if (trackEvent) {
+      trackEvent('Mirror Confrontation');
+    }
     const result = await getMirrorReflection(input);
     setReflection(result);
     setLoading(false);
@@ -52,13 +59,13 @@ const TheMirror: React.FC = () => {
             <p className="text-stone-700 text-[9px] mb-6 font-mono-machine uppercase tracking-[0.4em]">Your Presence</p>
             <p className="text-stone-400 italic text-2xl font-serif-brutal">"{input}"</p>
           </div>
-          
+
           <div className="p-10 border-l-2 border-red-600 bg-black relative overflow-hidden red-pulse-border">
-             <div className="scanline-red opacity-20"></div>
-             <p className="text-red-600 text-[9px] mb-6 font-mono-machine uppercase tracking-[0.5em] animate-pulse">The Reflection</p>
-             <p className="text-3xl md:text-5xl font-extrabold tracking-tightest text-white uppercase leading-tight glitch-text">
-               {reflection}
-             </p>
+            <div className="scanline-red opacity-20"></div>
+            <p className="text-red-600 text-[9px] mb-6 font-mono-machine uppercase tracking-[0.5em] animate-pulse">The Reflection</p>
+            <p className="text-3xl md:text-5xl font-extrabold tracking-tightest text-white uppercase leading-tight glitch-text">
+              {reflection}
+            </p>
           </div>
 
           <button

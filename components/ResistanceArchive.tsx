@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { ARCHIVE_ITEMS } from '../constants';
 import { curateSubmission } from '../services/gemini';
 
-const ResistanceArchive: React.FC = () => {
+interface ResistanceArchiveProps {
+  trackEvent?: (name: string, data?: any) => void;
+}
+
+const ResistanceArchive: React.FC<ResistanceArchiveProps> = ({ trackEvent }) => {
   const [isContributing, setIsContributing] = useState(false);
   const [submission, setSubmission] = useState('');
   const [author, setAuthor] = useState('');
@@ -12,11 +16,19 @@ const ResistanceArchive: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!submission.trim()) return;
-    
+
     setIsPending(true);
+    if (trackEvent) {
+      trackEvent('Archive Submission Attempted', { author: author || 'ANONYMOUS' });
+    }
     const result = await curateSubmission(submission);
     setFeedback(result);
     setIsPending(false);
+
+    if (trackEvent) {
+      const isAccepted = result?.includes('[ACCEPTED]');
+      trackEvent(isAccepted ? 'Archive Submission Accepted' : 'Archive Submission Rejected');
+    }
   };
 
   const isAccepted = feedback?.includes('[ACCEPTED]');
@@ -29,9 +41,13 @@ const ResistanceArchive: React.FC = () => {
         <p className="text-stone-400 font-serif-brutal text-2xl max-w-2xl leading-relaxed">
           A collective testimony of defiance. Here we store the fragments of those who refuse to live on autopilot.
         </p>
-        <button 
+        <button
           onClick={() => {
-            setIsContributing(!isContributing);
+            const nextState = !isContributing;
+            setIsContributing(nextState);
+            if (nextState && trackEvent) {
+              trackEvent('Archive Contribution Started');
+            }
             setFeedback(null);
             setSubmission('');
           }}
@@ -46,7 +62,7 @@ const ResistanceArchive: React.FC = () => {
           <div className="absolute top-0 right-0 p-4 font-mono-machine text-[8px] text-stone-800 tracking-[0.5em] uppercase pointer-events-none">
             Protocol: Submission_Alpha_v.4
           </div>
-          
+
           {!feedback ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
               <div>
@@ -63,19 +79,19 @@ const ResistanceArchive: React.FC = () => {
                   </ul>
                 </div>
               </div>
-              
+
               <form onSubmit={handleSubmit} className="flex flex-col gap-8">
                 <div className="space-y-2">
                   <label className="text-stone-700 font-mono-machine text-[9px] uppercase tracking-[0.3em]">Identity (Optional)</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="ANONYMOUS"
                     className="w-full bg-transparent border-b border-stone-800 py-4 text-stone-200 font-mono-machine focus:outline-none focus:border-red-muted transition-colors uppercase text-xs tracking-widest placeholder:text-stone-800"
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="text-stone-700 font-mono-machine text-[9px] uppercase tracking-[0.3em]">Testimony / Fragment</label>
                   <textarea
@@ -113,36 +129,36 @@ const ResistanceArchive: React.FC = () => {
                   </div>
 
                   <div className="flex flex-col md:flex-row gap-8">
-                     <div className={`flex-1 p-6 border ${isAccepted ? 'border-red-muted bg-red-muted/5' : 'border-stone-800 bg-stone-950'} transition-all`}>
-                        <p className="text-[9px] font-mono-machine text-stone-600 uppercase tracking-widest mb-3">Spine Integrity</p>
-                        <p className={`text-xl font-bold uppercase tracking-tightest ${isAccepted ? 'text-red-muted' : 'text-stone-500'}`}>
-                          {isAccepted ? 'VERIFIED / STRONG' : 'FAILED / BRITTLE'}
-                        </p>
-                     </div>
-                     <div className="flex-1 p-6 border border-stone-800 bg-stone-950">
-                        <p className="text-[9px] font-mono-machine text-stone-600 uppercase tracking-widest mb-3">Linguistic Weight</p>
-                        <p className="text-xl font-bold uppercase tracking-tightest text-stone-400">
-                          {submission.length > 200 ? 'DENSE' : submission.length > 50 ? 'CONCISE' : 'MINIMAL'}
-                        </p>
-                     </div>
+                    <div className={`flex-1 p-6 border ${isAccepted ? 'border-red-muted bg-red-muted/5' : 'border-stone-800 bg-stone-950'} transition-all`}>
+                      <p className="text-[9px] font-mono-machine text-stone-600 uppercase tracking-widest mb-3">Spine Integrity</p>
+                      <p className={`text-xl font-bold uppercase tracking-tightest ${isAccepted ? 'text-red-muted' : 'text-stone-500'}`}>
+                        {isAccepted ? 'VERIFIED / STRONG' : 'FAILED / BRITTLE'}
+                      </p>
+                    </div>
+                    <div className="flex-1 p-6 border border-stone-800 bg-stone-950">
+                      <p className="text-[9px] font-mono-machine text-stone-600 uppercase tracking-widest mb-3">Linguistic Weight</p>
+                      <p className="text-xl font-bold uppercase tracking-tightest text-stone-400">
+                        {submission.length > 200 ? 'DENSE' : submission.length > 50 ? 'CONCISE' : 'MINIMAL'}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col justify-center items-center p-12 border border-stone-900 bg-stone-950 text-center space-y-8">
-                   <div className="w-16 h-16 rounded-full border-2 border-dashed border-stone-800 flex items-center justify-center">
-                      <div className={`w-4 h-4 rounded-full ${isAccepted ? 'bg-red-muted animate-pulse shadow-[0_0_15px_#8B0000]' : 'bg-stone-800'}`}></div>
-                   </div>
-                   <div>
-                      <h4 className="font-mono-machine text-[10px] text-stone-600 uppercase tracking-[0.3em] mb-4">Official Verdict</h4>
-                      <p className={`text-4xl font-extrabold tracking-tightest uppercase leading-none ${isAccepted ? 'text-red-muted' : 'text-stone-700'}`}>
-                        {isAccepted ? 'ACCEPTED' : 'REJECTED'}
-                      </p>
-                   </div>
-                   <p className="text-stone-500 font-serif-brutal italic text-sm leading-relaxed">
-                     {isAccepted 
-                       ? "Your testimony has been immortalized in the digital bone of this project." 
-                       : "This fragment lacked the necessary truth to survive the curation."}
-                   </p>
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-stone-800 flex items-center justify-center">
+                    <div className={`w-4 h-4 rounded-full ${isAccepted ? 'bg-red-muted animate-pulse shadow-[0_0_15px_#8B0000]' : 'bg-stone-800'}`}></div>
+                  </div>
+                  <div>
+                    <h4 className="font-mono-machine text-[10px] text-stone-600 uppercase tracking-[0.3em] mb-4">Official Verdict</h4>
+                    <p className={`text-4xl font-extrabold tracking-tightest uppercase leading-none ${isAccepted ? 'text-red-muted' : 'text-stone-700'}`}>
+                      {isAccepted ? 'ACCEPTED' : 'REJECTED'}
+                    </p>
+                  </div>
+                  <p className="text-stone-500 font-serif-brutal italic text-sm leading-relaxed">
+                    {isAccepted
+                      ? "Your testimony has been immortalized in the digital bone of this project."
+                      : "This fragment lacked the necessary truth to survive the curation."}
+                  </p>
                 </div>
               </div>
 
@@ -173,9 +189,9 @@ const ResistanceArchive: React.FC = () => {
                 <div className="flex-1 flex flex-col">
                   <h3 className="text-xl font-bold mb-6 tracking-tight uppercase">{item.title}</h3>
                   <div className="flex-1 overflow-hidden border border-stone-900">
-                    <img 
-                      src={item.content} 
-                      alt={item.title} 
+                    <img
+                      src={item.content}
+                      alt={item.title}
                       className="w-full h-full object-cover grayscale opacity-50 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                     />
                   </div>

@@ -14,13 +14,15 @@ interface AudioPlayerProps {
   index: number;
   isCurrentTrack?: boolean;
   onPlayRequest?: () => void;
+  trackEvent?: (name: string, data?: any) => void;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack = false, onPlayRequest }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack = false, onPlayRequest, trackEvent }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [reachedMilestone, setReachedMilestone] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -51,7 +53,22 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack 
     const dur = audioRef.current.duration;
     setCurrentTime(cur);
     setDuration(dur);
-    setProgress((cur / dur) * 100);
+    const percentage = (cur / dur) * 100;
+    setProgress(percentage);
+
+    if (percentage >= 50 && !reachedMilestone) {
+      setReachedMilestone(true);
+      if (trackEvent) {
+        trackEvent('Music Milestone 50%', { track: track.title });
+      }
+    }
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    if (trackEvent) {
+      trackEvent('Music Completed', { track: track.title });
+    }
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -165,7 +182,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack 
         src={track.audioUrl}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={handleEnded}
       />
     </div>
   );

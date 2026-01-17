@@ -111,6 +111,7 @@ const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
                                                     index={ti}
                                                     isCurrentTrack={currentPlayingId === uniqueKey}
                                                     onPlayRequest={() => handlePlayRequest(uniqueKey, track.title)}
+                                                    trackEvent={trackEvent}
                                                 />
                                             </div>
                                         );
