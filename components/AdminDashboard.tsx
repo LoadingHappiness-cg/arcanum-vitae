@@ -169,6 +169,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
     }
   };
 
+  const handleReset = async () => {
+    if (!window.confirm('WARNING: THIS WILL WIPE ALL CUSTOM CHANGES AND REVERT TO THE HARDCODED PROTOCOL. PROCEED?')) return;
+    try {
+      const res = await authFetch('/api/reset', { method: 'POST' });
+      if (!res.ok) throw new Error('RESET_FAILED');
+      localStorage.clear();
+      alert('SYSTEM_RESET: PERSISTENCE_EXPUNGED. RELOADING...');
+      window.location.reload();
+    } catch (error) {
+      console.error('Reset failed:', error);
+      alert('ERROR: RESET_PROTOCOL_FAILED');
+    }
+  };
+
   const handleSave = async () => {
     try {
       const res = await authFetch('/api/save', {
@@ -293,6 +307,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
                 </div>
               </div>
             </div>
+
+            <div className="p-8 border border-red-900/40 bg-red-900/5 stagger-item">
+              <h3 className="text-red-600 font-mono-machine text-[10px] tracking-widest uppercase mb-4">PROTOCOL_RESET ( EMERGENCY_USE_ONLY )</h3>
+              <p className="text-stone-500 font-mono-machine text-[9px] leading-relaxed uppercase mb-8 max-w-2xl">
+                FORCE SYSTEM WIPE. THIS WILL DELETE THE SERVER PERSISTENCE FILE AND CLEAR LOCAL STORAGE.
+                THE MANIFESTO WILL REVERT TO THE HARDCODED DEFAULTS (THE "BONE" STATE).
+              </p>
+              <button
+                onClick={handleReset}
+                className="px-8 py-4 border border-red-600/50 text-red-600 font-mono-machine text-[10px] tracking-widest uppercase hover:bg-red-600 hover:text-black transition-all"
+              >
+                EXECUTE_PROTOCOL_RESET
+              </button>
+            </div>
+
             <div className="p-8 border border-stone-900">
               <h3 className="text-stone-600 font-mono-machine text-[10px] tracking-widest uppercase mb-4">Self-Hosting Instructions</h3>
               <p className="text-stone-500 font-mono-machine text-[9px] leading-relaxed uppercase">

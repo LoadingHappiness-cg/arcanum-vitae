@@ -341,6 +341,18 @@ app.post('/api/save', requireAdmin, (req, res) => {
     }
 });
 
+app.post('/api/reset', requireAdmin, (req, res) => {
+    try {
+        if (fs.existsSync(DATA_PATH)) {
+            fs.unlinkSync(DATA_PATH);
+        }
+        res.json({ success: true, message: "PERSISTENCE_WIPED: SYSTEM_REVERTED_TO_PROTOCOL" });
+    } catch (error) {
+        console.error('Reset failed:', error);
+        res.status(500).json({ error: "Reset failed" });
+    }
+});
+
 app.get('/api/files/list', requireAdmin, (req, res) => {
     const { type } = req.query;
     const subDir = type === 'audio' ? 'audio' : type === 'image' ? 'images' : '';
