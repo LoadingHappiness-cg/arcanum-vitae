@@ -5,10 +5,18 @@ import AudioPlayer from '../AudioPlayer';
 
 interface MusicViewProps {
     albums: Album[];
+    trackEvent?: (name: string, data?: any) => void;
 }
 
-const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
+const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
     const [currentPlayingId, setCurrentPlayingId] = React.useState<string | number | null>(null);
+
+    const handlePlayRequest = (id: string | number, title: string) => {
+        setCurrentPlayingId(id);
+        if (trackEvent) {
+            trackEvent('Music Started', { track: title });
+        }
+    };
 
     const scrollToTrack = (id: string) => {
         const element = document.getElementById(id);
@@ -102,7 +110,7 @@ const MusicView: React.FC<MusicViewProps> = ({ albums }) => {
                                                     track={track}
                                                     index={ti}
                                                     isCurrentTrack={currentPlayingId === uniqueKey}
-                                                    onPlayRequest={() => setCurrentPlayingId(uniqueKey)}
+                                                    onPlayRequest={() => handlePlayRequest(uniqueKey, track.title)}
                                                 />
                                             </div>
                                         );

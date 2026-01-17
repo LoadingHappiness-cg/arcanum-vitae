@@ -42,6 +42,13 @@ const App: React.FC = () => {
   const [homeContent, setHomeContent] = useState(INITIAL_HOME_CONTENT);
   const [analyticsContent, setAnalyticsContent] = useState(INITIAL_ANALYTICS_CONTENT);
 
+  // Umami Event Tracking Utility
+  const trackEvent = (eventName: string, data?: any) => {
+    if ((window as any).umami && typeof (window as any).umami.track === 'function') {
+      (window as any).umami.track(eventName, data);
+    }
+  };
+
   const resolveUmamiScriptUrl = () => {
     const fallback = 'https://cloud.umami.is/script.js';
     const raw = (analyticsContent.umami.srcUrl || '').trim();
@@ -166,8 +173,8 @@ const App: React.FC = () => {
         hydrateFromLocalStorage();
       });
 
-    // Initial loading animation
-    const timer = setTimeout(() => setIsLoading(false), 2000);
+    // Initial loading animation - disappear when data is ready or timeout
+    const timer = setTimeout(() => setIsLoading(false), 500); // Reduced delay
     return () => clearTimeout(timer);
   }, []);
 
@@ -181,6 +188,7 @@ const App: React.FC = () => {
 
   const navigate = (view: View) => {
     setIsTransitioning(true);
+    trackEvent('View Changed', { view });
     setTimeout(() => {
       setCurrentView(view);
       setIsTransitioning(false);
@@ -239,7 +247,7 @@ const App: React.FC = () => {
     }
 
     switch (currentView) {
-      case View.MUSIC: return <MusicView albums={albums} />;
+      case View.MUSIC: return <MusicView albums={albums} trackEvent={trackEvent} />;
       case View.WORDS: return <WordsView fragments={fragments} />;
       case View.VISUALS: return <VisualsView visuals={visuals} />;
       case View.ABOUT: return (
@@ -251,13 +259,14 @@ const App: React.FC = () => {
         />
       );
       case View.LEGAL: return <LegalView legalContent={legalContent} />;
-      // case View.MIRROR: return <TheMirror />; // Disabled
-      case View.ARCHIVE: return <ResistanceArchive />;
+      // case View.MIRROR: return <TheMirror trackEvent={trackEvent} />; // Disabled
+      case View.ARCHIVE: return <ResistanceArchive trackEvent={trackEvent} />;
       case View.ADMIN: return (
         <AdminDashboard
           data={{ albums, fragments, visuals, humanManifesto, humanIdentity, fictionDec, aiDec, legalContent, homeContent, analyticsContent }}
           onSave={handleAdminSave}
           onExit={() => navigate(View.HOME)}
+          trackEvent={trackEvent}
         />
       );
       default: return <HomeView isEntered={isEntered} onEnter={() => setIsEntered(true)} homeContent={homeContent} />;

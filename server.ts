@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -7,6 +6,8 @@ import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from "@google/genai";
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
 
 dotenv.config();
 
@@ -19,6 +20,21 @@ const DATA_PATH = path.join(__dirname, 'data', 'db.json');
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 const UMAMI_PROXY_BASE = (process.env.UMAMI_PROXY_BASE || '').trim().replace(/\/+$/, '');
+
+// Trust proxy for HAProxy and Cloudflare
+app.set('trust proxy', 1);
+
+// Security Headers
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "script-src": ["'self'", "'unsafe-inline'", "https://cloud.umami.is", "https://www.googletagmanager.com"],
+            "img-src": ["'self'", "data:", "https://images.unsplash.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+            "connect-src": ["'self'", "https://cloud.umami.is", "https://www.google-analytics.com", "https://analytics.google.com"],
+        },
+    },
+}));
 
 const defaultCorsOrigins = [
     'http://localhost:3000',
@@ -41,6 +57,27 @@ app.use(cors({
         return callback(null, false);
     }
 }));
+
+// Rate Limiting
+const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: { error: 'Too many requests, please try again later.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 10,
+    message: { error: 'Too many login attempts, please try again after an hour.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/auth', authLimiter);
+
 app.use(express.json({ limit: '2mb' }));
 
 // Serve static files from the Vite build
@@ -329,7 +366,7 @@ app.post('/api/mirror', requireAdmin, async (req, res) => {
     const { input } = req.body;
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = (genAI as any).getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = `Mirror system prompt... Input: ${input}`;
         const result = await model.generateContent(prompt);
         res.json({ text: result.response.text() });
@@ -344,7 +381,7 @@ app.post('/api/curate', requireAdmin, async (req, res) => {
     const { input } = req.body;
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = (genAI as any).getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent(input);
         res.json({ text: result.response.text() });
     } catch (error) {
@@ -396,11 +433,15 @@ app.post('/umami/api/send', async (req, res) => {
         return res.status(503).json({ error: 'Umami proxy is not configured.' });
     }
     try {
+        // Forward correct IP to Umami
+        const clientIp = req.get('cf-connecting-ip') || req.ip || '';
+
         const upstream = await fetch(`${UMAMI_PROXY_BASE}/api/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'User-Agent': req.get('user-agent') || ''
+                'User-Agent': req.get('user-agent') || '',
+                'X-Forwarded-For': clientIp
             },
             body: JSON.stringify(req.body ?? {})
         });
