@@ -1,4 +1,5 @@
 import express from 'express';
+import fileUpload from 'express-fileupload';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
@@ -23,6 +24,12 @@ const UMAMI_PROXY_BASE = (process.env.UMAMI_PROXY_BASE || '').trim().replace(/\/
 
 // Trust proxy for HAProxy and Cloudflare
 app.set('trust proxy', 1);
+
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
+    useTempFiles: true,
+    tempFileDir: '/tmp/'
+}));
 
 // Security Headers
 app.use(helmet({
@@ -142,12 +149,13 @@ const isRecord = (value: unknown): value is Record<string, unknown> => (
 );
 
 const isString = (value: unknown): value is string => typeof value === 'string';
+const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean';
 
 const isTrack = (value: unknown) => (
     isRecord(value) &&
     isString(value.title) &&
-    isString(value.lyrics) &&
-    isString(value.story) &&
+    (value.lyrics === undefined || value.lyrics === null || isString(value.lyrics)) &&
+    (value.story === undefined || value.story === null || isString(value.story)) &&
     isString(value.audioUrl)
 );
 
@@ -157,10 +165,11 @@ const isAlbum = (value: unknown) => (
     isString(value.title) &&
     isString(value.year) &&
     isString(value.concept) &&
-    (value.context === undefined || isString(value.context)) &&
+    (value.context === undefined || value.context === null || isString(value.context)) &&
     isString(value.coverUrl) &&
     Array.isArray(value.tracks) &&
-    value.tracks.every(isTrack)
+    value.tracks.every(isTrack) &&
+    (value.isUpcoming === undefined || value.isUpcoming === null || isBoolean(value.isUpcoming))
 );
 
 const isFragment = (value: unknown) => (
@@ -331,13 +340,18 @@ app.get('/api/data', (req, res) => {
 app.post('/api/save', requireAdmin, (req, res) => {
     const validation = validateData(req.body);
     if (!validation.ok) {
-        return res.status(400).json({ error: "Invalid data", details: validation.errors });
+        console.warn('Save rejected (Validation failed):', validation.errors);
+        return res.status(400).json({
+            error: "INVALID_PROTO_DATA",
+            details: validation.errors.join('; ')
+        });
     }
     try {
         saveData(req.body);
         res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: "Failed to save data" });
+        console.error('Save failed (FS error):', error);
+        res.status(500).json({ error: "FS_SAVE_ERROR" });
     }
 });
 
@@ -373,6 +387,47 @@ app.get('/api/files/list', requireAdmin, (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "Failed to list files" });
     }
+});
+
+app.post('/api/upload', requireAdmin, (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).json({ error: "NO_FILES_UPLOADED" });
+    }
+
+    const uploadedFile = req.files.file as any;
+    if (!uploadedFile) {
+        return res.status(400).json({ error: "MISSING_FILE_FIELD" });
+    }
+
+    const { type } = req.body;
+    const isAudio = uploadedFile.mimetype.startsWith('audio/');
+    const isImage = uploadedFile.mimetype.startsWith('image/');
+
+    const subDir = type === 'audio' || isAudio ? 'audio' : (type === 'image' || isImage ? 'images' : '');
+
+    if (!subDir) {
+        return res.status(400).json({ error: "INVALID_FILE_TYPE_OR_TARGET" });
+    }
+
+    const dirPath = path.join(__dirname, 'public', 'media', subDir);
+    if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // Sanitize filename
+    const safeName = uploadedFile.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+    const finalPath = path.join(dirPath, safeName);
+
+    uploadedFile.mv(finalPath, (err: any) => {
+        if (err) {
+            console.error('File move failed:', err);
+            return res.status(500).json({ error: "UPLOAD_MV_FAILED" });
+        }
+        res.json({
+            success: true,
+            url: `/media/${subDir}/${safeName}`
+        });
+    });
 });
 
 app.post('/api/mirror', requireAdmin, async (req, res) => {

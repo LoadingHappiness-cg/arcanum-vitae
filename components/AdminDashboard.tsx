@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Album, WordFragment, VisualItem, View, FictionDeclaration, AiDeclaration, HumanIdentity, LegalContent, HomeContent, AnalyticsContent } from '../types';
 import { AI_DECLARATION, FICTION_DECLARATION, INITIAL_HUMAN_IDENTITY, INITIAL_HUMAN_MANIFESTO, INITIAL_LEGAL_CONTENT, INITIAL_HOME_CONTENT, INITIAL_ANALYTICS_CONTENT } from '../constants';
 
@@ -62,6 +62,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
 
   const [browserSelection, setBrowserSelection] = useState<{ type: 'audio' | 'image', ai: number, ti?: number, vi?: number } | null>(null);
   const [availableFiles, setAvailableFiles] = useState<{ name: string, url: string }[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const umamiRawUrl = localData.analyticsContent?.umami.srcUrl ?? '';
   const umamiNormalizedUrl = normalizeUmamiScriptUrl(umamiRawUrl);
   const showUmamiWarning = Boolean(umamiRawUrl.trim()) && umamiRawUrl.trim() !== umamiNormalizedUrl;
@@ -145,6 +147,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
     setBrowserSelection(null);
   };
 
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !browserSelection) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', browserSelection.type);
+
+    try {
+      const res = await authFetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'UPLOAD_FAILED');
+
+      // Refresh file list
+      await openFileBrowser(browserSelection.type, browserSelection.ai, browserSelection.ti, browserSelection.vi);
+      alert('UPLOAD_SUCCESS: ASSET_PERSISTED_TO_MEDIA');
+    } catch (error: any) {
+      console.error('Upload failed:', error);
+      alert(`UPLOAD_ERROR: ${error.message || 'SERVER_OR_AUTH_FAILURE'}`);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -190,17 +221,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(localData),
       });
+      const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error('SAVE_FAILED');
+        throw new Error(payload.details || payload.error || 'SAVE_FAILED');
       }
       if (trackEvent) {
         trackEvent('Admin Save');
       }
       onSave(localData);
       alert('MANIFEST_UPDATED: CHANGES_COMMITTED_TO_BONE');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Save failed:', error);
-      alert('SAVE_FAILED: AUTH_OR_SERVER_ERROR');
+      alert(`SAVE_FAILED: ${error.message || 'AUTH_OR_SERVER_ERROR'}`);
     }
   };
 
@@ -939,6 +971,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
                   }}
                   placeholder="ALBUM_CONCEPT"
                 />
+                <textarea
+                  className="w-full h-32 bg-black border border-stone-800 p-4 font-mono-machine text-[10px] text-stone-500 uppercase leading-relaxed"
+                  value={album.context}
+                  onChange={(e) => {
+                    const newAlbums = [...localData.albums];
+                    newAlbums[ai].context = e.target.value;
+                    setLocalData({ ...localData, albums: newAlbums });
+                  }}
+                  placeholder="ALBUM_CONTEXT (STRICT_MANIFESTO)"
+                />
 
                 <div className="space-y-8 pt-8 border-t border-stone-900">
                   <h4 className="text-[10px] font-mono-machine tracking-[0.4em] text-red-900 uppercase">TRACKLIST_DATA</h4>
@@ -1039,9 +1081,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
         <div className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-md flex items-center justify-center p-6">
           <div className="max-w-4xl w-full border border-red-900 bg-stone-950 p-12 max-h-[80vh] flex flex-col">
             <div className="flex justify-between items-center mb-10">
-              <h3 className="text-xl font-extrabold uppercase text-white font-mono-machine tracking-[0.3em]">
-                SELECT_{browserSelection.type.toUpperCase()}_ASSET
-              </h3>
+              <div className="flex items-center gap-6">
+                <h3 className="text-xl font-extrabold uppercase text-white font-mono-machine tracking-[0.3em]">
+                  SELECT_{browserSelection.type.toUpperCase()}_ASSET
+                </h3>
+                <button
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`px-4 py-2 border ${uploading ? 'border-stone-800 text-stone-700' : 'border-red-900 text-red-900 hover:bg-red-900 hover:text-black'} transition-all font-mono-machine text-[9px] uppercase`}
+                >
+                  {uploading ? 'UPLOADING_PROTOCOL...' : '[ UPLOAD_NEW ]'}
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept={browserSelection.type === 'audio' ? 'audio/*' : 'image/*'}
+                  onChange={handleUpload}
+                />
+              </div>
               <button
                 onClick={() => setBrowserSelection(null)}
                 className="text-stone-500 hover:text-white font-mono-machine text-[10px]"
@@ -1053,7 +1111,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
             <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
               {availableFiles.length === 0 ? (
                 <div className="col-span-2 py-20 text-center border border-dashed border-stone-900 text-stone-700 font-mono-machine uppercase text-[10px]">
-                  NO_FILES_DETECTED_IN_MEDIA/{browserSelection.type}S/
+                  NO_FILES_DETECTED_IN_MEDIA/{browserSelection.type.toUpperCase()}S/
                 </div>
               ) : (
                 availableFiles.map((file) => (
@@ -1063,14 +1121,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
                     className="p-4 border border-stone-900 text-left hover:border-red-600 group transition-all"
                   >
                     <div className="text-[10px] text-stone-500 font-mono-machine mb-2 group-hover:text-red-900 transition-colors uppercase">
-                      FILE_PATH (READY)
+                      [{file.url.split('.').pop()?.toUpperCase() || 'FILE'}]_READY
                     </div>
                     <div className="text-sm font-syne font-bold text-stone-200 group-hover:text-white truncate">
                       {file.name}
                     </div>
                     {browserSelection.type === 'audio' && (
                       <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                        <audio controls src={file.url} className="w-full h-6 opacity-50 hover:opacity-100 transition-opacity" />
+                        <audio controls src={file.url} className="w-full h-6 opacity-30 hover:opacity-100 transition-opacity" />
                       </div>
                     )}
                   </button>
@@ -1078,10 +1136,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
               )}
             </div>
 
-            <div className="mt-10 pt-8 border-t border-stone-900">
-              <p className="text-[8px] font-mono-machine text-stone-700 uppercase leading-relaxed">
-                MANUAL_OVERRIDE: PLACE FILES IN `public/media/{browserSelection.type === 'audio' ? 'audio' : 'images'}/` DIRECTORY TO LIST THEM HERE.
+            <div className="mt-10 pt-8 border-t border-stone-900 flex justify-between items-end">
+              <p className="text-[8px] font-mono-machine text-stone-700 uppercase leading-relaxed max-w-xl">
+                SYSTEM_MANIFESTO: ASSETS UPLOADED HERE ARE PERSISTED TO `<span className="text-stone-500">public/media/{browserSelection.type === 'audio' ? 'audio' : 'images'}/</span>` AND WILL PERSIST ACROSS DEPLOYMENTS IF REPOSITORY INTEGRITY IS MAINTAINED.
               </p>
+              <div className="text-[8px] font-mono-machine text-stone-800 uppercase">
+                {availableFiles.length} ASSETS_DETECTED
+              </div>
             </div>
           </div>
         </div>
