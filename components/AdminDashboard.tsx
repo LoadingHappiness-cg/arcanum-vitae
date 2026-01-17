@@ -18,6 +18,7 @@ interface AdminDashboardProps {
   };
   onSave: (newData: any) => void;
   onExit: () => void;
+  trackEvent?: (name: string, data?: any) => void;
 }
 
 const normalizeData = (input: AdminDashboardProps['data']) => ({
@@ -43,7 +44,7 @@ const normalizeUmamiScriptUrl = (value: string) => {
   return trimmed;
 };
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, trackEvent }) => {
   const [authToken, setAuthToken] = useState(() => {
     if (typeof window === 'undefined') return '';
     return sessionStorage.getItem('av_admin_token') || '';
@@ -177,6 +178,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit })
       });
       if (!res.ok) {
         throw new Error('SAVE_FAILED');
+      }
+      if (trackEvent) {
+        trackEvent('Admin Save');
       }
       onSave(localData);
       alert('MANIFEST_UPDATED: CHANGES_COMMITTED_TO_BONE');
