@@ -25,7 +25,7 @@ const UMAMI_PROXY_BASE = (process.env.UMAMI_PROXY_BASE || '').trim().replace(/\/
 // Trust proxy for HAProxy and Cloudflare
 app.set('trust proxy', 1);
 
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '10mb' }));
 
 app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
