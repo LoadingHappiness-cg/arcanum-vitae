@@ -223,7 +223,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(payload.details || payload.error || 'SAVE_FAILED');
+        const errorMsg = payload.details || payload.error || `SERVER_ERROR_${res.status}`;
+        throw new Error(errorMsg);
       }
       if (trackEvent) {
         trackEvent('Admin Save');
