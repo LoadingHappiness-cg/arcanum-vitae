@@ -29,8 +29,10 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            "script-src": ["'self'", "'unsafe-inline'", "https://cloud.umami.is", "https://www.googletagmanager.com"],
-            "img-src": ["'self'", "data:", "https://images.unsplash.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+            "script-src": ["'self'", "'unsafe-inline'", "https://cloud.umami.is", "https://www.googletagmanager.com", "https://cdn.tailwindcss.com", "https://esm.sh"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.tailwindcss.com"],
+            "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
+            "img-src": ["'self'", "data:", "https://images.unsplash.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://grainy-gradients.vercel.app"],
             "connect-src": ["'self'", "https://cloud.umami.is", "https://www.google-analytics.com", "https://analytics.google.com"],
         },
     },
