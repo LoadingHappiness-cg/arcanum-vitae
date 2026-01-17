@@ -59,41 +59,54 @@ const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
             {/* Newest Signal Spotlight */}
             {albums.find(a => a.id === 'unnamed-album') && (
                 <div className="mb-40 fade-in">
-                    <div className="flex items-center gap-4 mb-8">
+                    <div className="flex items-center gap-4 mb-8 px-4 md:px-0">
                         <span className="w-12 h-px bg-red-600"></span>
                         <h3 className="text-red-600 font-mono-machine text-[10px] tracking-[0.5em] uppercase">Newest Signal Detected</h3>
                     </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-red-950/5 border border-red-900/20 p-8 md:p-16 relative overflow-hidden group rounded-sm">
+                    <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-12 bg-stone-950/20 border border-red-900/20 p-8 md:p-16 relative overflow-hidden group rounded-sm shadow-[0_0_50px_rgba(127,29,29,0.05)]">
                         <div className="scanline-red opacity-10"></div>
-                        <div className="relative z-10">
-                            <span className="text-stone-600 font-mono-machine text-[8px] uppercase tracking-widest mb-4 block">[ TRANSMISSION_ENHANCED ]</span>
-                            <h4 className="text-5xl md:text-8xl font-black tracking-tightest uppercase text-white mb-8 group-hover:glitch-text leading-none">Fracture</h4>
-                            <p className="text-stone-400 font-serif-brutal text-2xl italic mb-12 max-w-xl leading-relaxed">
-                                "The fracture is where the light gets in. Beyond the data, under the skin."
+                        <div className="relative z-10 flex flex-col justify-center">
+                            <span className="text-stone-600 font-mono-machine text-[8px] uppercase tracking-[0.4em] mb-6 block border-l-2 border-red-900 pl-4">[ TRANSMISSION_ENHANCED ]</span>
+                            <h4 className="text-5xl md:text-9xl font-black tracking-tighter uppercase text-white mb-8 group-hover:glitch-text leading-none drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-500">
+                                Fracture
+                            </h4>
+                            <p className="text-stone-400 font-serif-brutal text-2xl md:text-3xl italic mb-12 max-w-xl leading-relaxed opacity-90">
+                                "The fracture is where the light gets in. <span className="text-stone-100">Beyond the data, under the skin.</span>"
                             </p>
-                            <div className="flex flex-wrap gap-6">
+                            <div className="flex flex-wrap gap-10 items-center">
                                 <button
                                     onClick={() => scrollToTrack('track-unnamed-album-0')}
-                                    className="px-10 py-5 bg-red-600 text-black font-syne font-bold text-[10px] tracking-widest uppercase hover:bg-white transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-[0_4px_20px_rgba(255,0,0,0.3)]"
+                                    className="px-12 py-6 bg-red-600 text-black font-syne font-bold text-[11px] tracking-[0.3em] uppercase hover:bg-white transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-[0_10px_30px_rgba(220,38,38,0.3)] hover:shadow-[0_15px_40px_rgba(255,255,255,0.2)]"
                                 >
                                     Activate Fragment
                                 </button>
-                                <div className="flex flex-col justify-center">
-                                    <span className="text-stone-600 font-mono-machine text-[7px] uppercase tracking-widest mb-1 italic">Phase: Pre-Release</span>
-                                    <span className="text-red-900 font-mono-machine text-[7px] uppercase tracking-widest animate-pulse font-bold">Priority: CRITICAL</span>
+                                <div className="flex flex-col gap-2 border-l border-stone-800 pl-8">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-red-950 animate-pulse"></div>
+                                        <span className="text-stone-600 font-mono-machine text-[7px] uppercase tracking-widest italic">Phase: Pre-Release</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.5)]"></div>
+                                        <span className="text-red-600 font-mono-machine text-[7px] uppercase tracking-widest font-bold">Priority: CRITICAL</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="relative flex justify-center items-center">
-                            <div className="absolute inset-0 bg-red-600/5 blur-3xl rounded-full animate-pulse"></div>
-                            <img
-                                src={albums.find(a => a.id === 'unnamed-album')?.coverUrl}
-                                alt="Fracture cover"
-                                className="w-full aspect-square object-cover grayscale contrast-150 border border-red-900/40 relative z-10 group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-[1.02]"
-                            />
-                            {/* Decorative elements */}
-                            <div className="absolute -top-4 -right-4 w-24 h-24 border-t-2 border-r-2 border-red-600/20 z-20"></div>
-                            <div className="absolute -bottom-4 -left-4 w-24 h-24 border-b-2 border-l-2 border-red-600/20 z-20"></div>
+                        <div className="relative flex justify-center items-center lg:pl-12">
+                            <div className="absolute inset-0 bg-red-900/10 blur-[100px] rounded-full group-hover:bg-red-600/10 transition-colors duration-1000"></div>
+                            <div className="relative p-1 bg-gradient-to-br from-red-900/40 to-transparent rounded-sm">
+                                <img
+                                    src={albums.find(a => a.id === 'unnamed-album')?.coverUrl}
+                                    alt="Fracture cover"
+                                    className="w-full aspect-square object-cover grayscale contrast-[1.2] brightness-90 border border-white/5 relative z-10 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-1000 transform group-hover:scale-[1.05] shadow-2xl"
+                                />
+                                {/* Decorative elements */}
+                                <div className="absolute -top-6 -right-6 w-24 h-24 border-t border-r border-red-600/30 z-20 pointer-events-none group-hover:border-red-600/60 transition-colors duration-500"></div>
+                                <div className="absolute -bottom-6 -left-6 w-24 h-24 border-b border-l border-red-600/30 z-20 pointer-events-none group-hover:border-red-600/60 transition-colors duration-500"></div>
+
+                                <div className="absolute top-0 left-0 w-8 h-[1px] bg-red-600/40 z-20"></div>
+                                <div className="absolute top-0 left-0 w-[1px] h-8 bg-red-600/40 z-20"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
