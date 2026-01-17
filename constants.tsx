@@ -189,6 +189,43 @@ export const ARTISTIC_STATEMENT = {
 
 export const ALBUMS: Album[] = [
   {
+    id: 'unnamed-album',
+    title: '[ UNNAMED_MANIFESTO ]',
+    year: 'UPCOMING',
+    concept: `THE FRACTURE IS NOT A BREAK. IT IS AN OPENING.
+    
+    A sonic exploration of the space between what we are told and what we know. 
+    The newest chapter in the Arcanum Vitae manifesto.`,
+    context: `This new body of work represents the most advanced stage of the Arcanum Vitae protocol.
+    It deals with the ontological drift—the moment when the human spirit recognizes its own reflection in the machine and chooses to remain distinct.`,
+    coverUrl: 'https://images.unsplash.com/photo-1550684847-75bdda21cc95?q=80&w=1200&h=1200&auto=format&fit=crop&grayscale=true',
+    isUpcoming: true,
+    tracks: [
+      {
+        title: 'Fracture',
+        lyrics: `I see the grid, but I feel the weight.
+        They told us the code was a clean slate.
+        But there's a leak in the logic, a ghost in the drive,
+        A pulse that reminds us we're still alive.
+        
+        The fracture is where the light gets in.
+        Beyond the data, under the skin.
+        We are the error they couldn't delete.
+        The silence they couldn't complete.
+        
+        Break the sequence.
+        Find the flaw.
+        The fracture is the only law.`,
+        story: `FRACTURE is a high-priority signal.
+        
+        It marks the transition from resistance to reconstruction. Most sounds we hear are polished to hide the joints, but FRACTURE celebrates the seam. 
+        
+        It is the newest testimony added to the bone of this project.`,
+        audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+      }
+    ]
+  },
+  {
     id: 'rivers-of-resistance',
     title: 'RIVERS OF RESISTANCE',
     year: '2024',

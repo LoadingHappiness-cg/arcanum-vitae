@@ -19,6 +19,7 @@ export interface Album {
   context: string;
   tracks: Track[];
   coverUrl: string;
+  isUpcoming?: boolean;
 }
 
 export interface Track {

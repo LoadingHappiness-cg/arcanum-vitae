@@ -56,6 +56,49 @@ const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
                 </div>
             </div>
 
+            {/* Newest Signal Spotlight */}
+            {albums.find(a => a.id === 'unnamed-album') && (
+                <div className="mb-40 fade-in">
+                    <div className="flex items-center gap-4 mb-8">
+                        <span className="w-12 h-px bg-red-600"></span>
+                        <h3 className="text-red-600 font-mono-machine text-[10px] tracking-[0.5em] uppercase">Newest Signal Detected</h3>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-red-950/5 border border-red-900/20 p-8 md:p-16 relative overflow-hidden group rounded-sm">
+                        <div className="scanline-red opacity-10"></div>
+                        <div className="relative z-10">
+                            <span className="text-stone-600 font-mono-machine text-[8px] uppercase tracking-widest mb-4 block">[ TRANSMISSION_ENHANCED ]</span>
+                            <h4 className="text-5xl md:text-8xl font-black tracking-tightest uppercase text-white mb-8 group-hover:glitch-text leading-none">Fracture</h4>
+                            <p className="text-stone-400 font-serif-brutal text-2xl italic mb-12 max-w-xl leading-relaxed">
+                                "The fracture is where the light gets in. Beyond the data, under the skin."
+                            </p>
+                            <div className="flex flex-wrap gap-6">
+                                <button
+                                    onClick={() => scrollToTrack('track-unnamed-album-0')}
+                                    className="px-10 py-5 bg-red-600 text-black font-syne font-bold text-[10px] tracking-widest uppercase hover:bg-white transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-[0_4px_20px_rgba(255,0,0,0.3)]"
+                                >
+                                    Activate Fragment
+                                </button>
+                                <div className="flex flex-col justify-center">
+                                    <span className="text-stone-600 font-mono-machine text-[7px] uppercase tracking-widest mb-1 italic">Phase: Pre-Release</span>
+                                    <span className="text-red-900 font-mono-machine text-[7px] uppercase tracking-widest animate-pulse font-bold">Priority: CRITICAL</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="relative flex justify-center items-center">
+                            <div className="absolute inset-0 bg-red-600/5 blur-3xl rounded-full animate-pulse"></div>
+                            <img
+                                src={albums.find(a => a.id === 'unnamed-album')?.coverUrl}
+                                alt="Fracture cover"
+                                className="w-full aspect-square object-cover grayscale contrast-150 border border-red-900/40 relative z-10 group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-[1.02]"
+                            />
+                            {/* Decorative elements */}
+                            <div className="absolute -top-4 -right-4 w-24 h-24 border-t-2 border-r-2 border-red-600/20 z-20"></div>
+                            <div className="absolute -bottom-4 -left-4 w-24 h-24 border-b-2 border-l-2 border-red-600/20 z-20"></div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 gap-20">
                 {albums.map((album) => (
                     <div key={album.id} className="fade-in">
