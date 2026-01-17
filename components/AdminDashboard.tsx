@@ -194,9 +194,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
       setAuthToken(payload.token);
       setIsAuthenticated(true);
       setPasskey('');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Admin auth failed:', error);
-      alert('ACCESS_DENIED: INVALID_MANIFEST_KEY');
+      alert(`ACCESS_DENIED: ${error.message || 'INVALID_MANIFEST_KEY'}`);
     }
   };
 
