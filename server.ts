@@ -25,6 +25,8 @@ const UMAMI_PROXY_BASE = (process.env.UMAMI_PROXY_BASE || '').trim().replace(/\/
 // Trust proxy for HAProxy and Cloudflare
 app.set('trust proxy', 1);
 
+app.use(express.json({ limit: '2mb' }));
+
 app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
     useTempFiles: true,
@@ -86,8 +88,6 @@ const authLimiter = rateLimit({
 
 app.use('/api/', generalLimiter);
 app.use('/api/auth', authLimiter);
-
-app.use(express.json({ limit: '2mb' }));
 
 // Serve static files from the Vite build
 app.use(express.static(path.join(__dirname, 'dist')));
