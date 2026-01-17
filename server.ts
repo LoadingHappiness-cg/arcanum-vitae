@@ -12,6 +12,15 @@ import { rateLimit } from 'express-rate-limit';
 
 dotenv.config();
 
+// Global error handling for debugging production crashes
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('UNHANDLED_REJECTION at:', promise, 'reason:', reason);
+});
+process.on('uncaughtException', (err) => {
+    console.error('UNCAUGHT_EXCEPTION:', err);
+    process.exit(1);
+});
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -560,10 +569,18 @@ app.use((req, res) => {
     }
 });
 
-app.listen(port, '0.0.0.0', () => {
+const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Arcanum Vitae active on http://0.0.0.0:${port}`);
     console.log(`Data storage: ${DATA_PATH}`);
     if (!ADMIN_KEY) {
         console.warn('ADMIN_KEY is not configured. Admin actions will be disabled.');
+    }
+});
+
+server.on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use.`);
+    } else {
+        console.error('SERVER_ERROR:', err);
     }
 });
