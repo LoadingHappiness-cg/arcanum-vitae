@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { View, Album, WordFragment, VisualItem, FictionDeclaration, AiDeclaration, HumanIdentity } from './types';
+import { View, Album, WordFragment, VisualItem, FictionDeclaration, AiDeclaration, HumanIdentity, Track, LegalContent, HomeContent, AnalyticsContent } from './types';
 import Navigation from './components/Navigation';
 import TheMirror from './components/TheMirror';
 import ResistanceArchive from './components/ResistanceArchive';
@@ -23,6 +23,125 @@ import {
   INITIAL_HOME_CONTENT,
   INITIAL_ANALYTICS_CONTENT
 } from './constants';
+
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+);
+
+const isString = (value: unknown): value is string => typeof value === 'string';
+const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean';
+
+const isTrack = (value: unknown): value is Track => (
+  isRecord(value) &&
+  isString(value.title) &&
+  isString(value.lyrics) &&
+  isString(value.story) &&
+  isString(value.audioUrl)
+);
+
+const isAlbum = (value: unknown): value is Album => (
+  isRecord(value) &&
+  isString(value.id) &&
+  isString(value.title) &&
+  isString(value.year) &&
+  isString(value.concept) &&
+  isString(value.context) &&
+  isString(value.coverUrl) &&
+  Array.isArray(value.tracks) &&
+  value.tracks.every(isTrack) &&
+  (value.isUpcoming === undefined || value.isUpcoming === null || isBoolean(value.isUpcoming))
+);
+
+const isFragment = (value: unknown): value is WordFragment => (
+  isRecord(value) &&
+  isString(value.id) &&
+  isString(value.text) &&
+  (value.source === undefined || isString(value.source))
+);
+
+const isVisual = (value: unknown): value is VisualItem => (
+  isRecord(value) &&
+  isString(value.id) &&
+  isString(value.url) &&
+  isString(value.title) &&
+  isString(value.description)
+);
+
+const isDeclaration = (value: unknown): value is FictionDeclaration => (
+  isRecord(value) &&
+  isString(value.main) &&
+  isString(value.details) &&
+  isString(value.tagline)
+);
+
+const isAiDeclaration = (value: unknown): value is AiDeclaration => (
+  isRecord(value) &&
+  isString(value.main) &&
+  Array.isArray(value.body) &&
+  value.body.every(isString) &&
+  isString(value.tagline)
+);
+
+const isHumanIdentity = (value: unknown): value is HumanIdentity => (
+  isRecord(value) &&
+  isString(value.footerQuote) &&
+  isString(value.originLabel) &&
+  isString(value.veritasName) &&
+  isString(value.veritasLink)
+);
+
+const isLegalSection = (value: unknown) => (
+  isRecord(value) &&
+  isString(value.id) &&
+  isString(value.title) &&
+  isString(value.body) &&
+  (value.list === undefined || (Array.isArray(value.list) && value.list.every(isString)))
+);
+
+const isLegalContent = (value: unknown): value is LegalContent => (
+  isRecord(value) &&
+  isString(value.heading) &&
+  isString(value.footer) &&
+  Array.isArray(value.sections) &&
+  value.sections.every(isLegalSection)
+);
+
+const isHomeContent = (value: unknown): value is HomeContent => (
+  isRecord(value) &&
+  isString(value.galleryMessage) &&
+  Array.isArray(value.galleryItems) &&
+  value.galleryItems.every((item) => (
+    isRecord(item) &&
+    isString(item.id) &&
+    isString(item.title) &&
+    isString(item.manifesto)
+  ))
+);
+
+const isAnalyticsContent = (value: unknown): value is AnalyticsContent => (
+  isRecord(value) &&
+  isRecord(value.umami) &&
+  typeof value.umami.enabled === 'boolean' &&
+  isString(value.umami.websiteId) &&
+  isString(value.umami.srcUrl) &&
+  (value.umami.domains === undefined || isString(value.umami.domains)) &&
+  isRecord(value.googleAnalytics) &&
+  typeof value.googleAnalytics.enabled === 'boolean' &&
+  isString(value.googleAnalytics.measurementId)
+);
+
+const readLocalJson = <T,>(key: string, validator: (value: unknown) => value is T): T | null => {
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (validator(parsed)) return parsed;
+  } catch (error) {
+    console.warn(`Invalid local cache removed for ${key}:`, error);
+  }
+  localStorage.removeItem(key);
+  return null;
+};
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>(View.HOME);
@@ -108,27 +227,33 @@ const App: React.FC = () => {
   const hydrateFromLocalStorage = () => {
     if (typeof window === 'undefined') return;
     try {
-      const storedAlbums = localStorage.getItem('av_albums');
-      const storedFragments = localStorage.getItem('av_fragments');
-      const storedVisuals = localStorage.getItem('av_visuals');
       const storedManifesto = localStorage.getItem('av_manifesto');
-      const storedIdentity = localStorage.getItem('av_identity');
-      const storedFiction = localStorage.getItem('av_fiction');
-      const storedAi = localStorage.getItem('av_ai');
-      const storedLegal = localStorage.getItem('av_legal');
-      const storedHome = localStorage.getItem('av_home');
-      const storedAnalytics = localStorage.getItem('av_analytics');
+      const storedAlbums = readLocalJson<Album[]>('av_albums', (value): value is Album[] => (
+        Array.isArray(value) && value.every(isAlbum)
+      ));
+      const storedFragments = readLocalJson<WordFragment[]>('av_fragments', (value): value is WordFragment[] => (
+        Array.isArray(value) && value.every(isFragment)
+      ));
+      const storedVisuals = readLocalJson<VisualItem[]>('av_visuals', (value): value is VisualItem[] => (
+        Array.isArray(value) && value.every(isVisual)
+      ));
+      const storedIdentity = readLocalJson<HumanIdentity>('av_identity', isHumanIdentity);
+      const storedFiction = readLocalJson<FictionDeclaration>('av_fiction', isDeclaration);
+      const storedAi = readLocalJson<AiDeclaration>('av_ai', isAiDeclaration);
+      const storedLegal = readLocalJson<LegalContent>('av_legal', isLegalContent);
+      const storedHome = readLocalJson<HomeContent>('av_home', isHomeContent);
+      const storedAnalytics = readLocalJson<AnalyticsContent>('av_analytics', isAnalyticsContent);
 
-      if (storedAlbums) setAlbums(JSON.parse(storedAlbums));
-      if (storedFragments) setFragments(JSON.parse(storedFragments));
-      if (storedVisuals) setVisuals(JSON.parse(storedVisuals));
+      if (storedAlbums) setAlbums(storedAlbums);
+      if (storedFragments) setFragments(storedFragments);
+      if (storedVisuals) setVisuals(storedVisuals);
       if (storedManifesto !== null) setHumanManifesto(storedManifesto);
-      if (storedIdentity) setHumanIdentity(JSON.parse(storedIdentity));
-      if (storedFiction) setFictionDec(JSON.parse(storedFiction));
-      if (storedAi) setAiDec(JSON.parse(storedAi));
-      if (storedLegal) setLegalContent(JSON.parse(storedLegal));
-      if (storedHome) setHomeContent(JSON.parse(storedHome));
-      if (storedAnalytics) setAnalyticsContent(JSON.parse(storedAnalytics));
+      if (storedIdentity) setHumanIdentity(storedIdentity);
+      if (storedFiction) setFictionDec(storedFiction);
+      if (storedAi) setAiDec(storedAi);
+      if (storedLegal) setLegalContent(storedLegal);
+      if (storedHome) setHomeContent(storedHome);
+      if (storedAnalytics) setAnalyticsContent(storedAnalytics);
     } catch (error) {
       console.error('Failed to hydrate from local storage:', error);
     }
