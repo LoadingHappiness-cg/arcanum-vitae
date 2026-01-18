@@ -6,23 +6,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('--- DIAGNOSTIC START ---');
-console.log('CWD:', process.cwd());
-console.log('DIRNAME:', __dirname);
-console.log('NODE:', process.version);
-
 const require = createRequire(import.meta.url);
 let fileUpload;
 try {
+    // Force direct load from lib to bypass ESM/CJS resolution issues in PM2
     fileUpload = require(path.join(__dirname, 'node_modules', 'express-fileupload', 'lib', 'index.js'));
-    console.log('express-fileupload loaded via absolute path.');
 } catch (e) {
-    try {
-        fileUpload = require('express-fileupload');
-        console.log('express-fileupload loaded via standard resolution.');
-    } catch (e2) {
-        console.error('CRITICAL: Could not find express-fileupload.');
-    }
+    fileUpload = require('express-fileupload');
 }
 
 import cors from 'cors';
