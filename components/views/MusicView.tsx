@@ -11,10 +11,19 @@ interface MusicViewProps {
 const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
     const [currentPlayingId, setCurrentPlayingId] = React.useState<string | number | null>(null);
 
-    const handlePlayRequest = (id: string | number, title: string) => {
+    const updateHash = (id: string) => {
+        if (typeof window === 'undefined') return;
+        const nextHash = `#${id}`;
+        if (window.location.hash !== nextHash) {
+            window.history.replaceState(null, '', nextHash);
+        }
+    };
+
+    const handlePlayRequest = (id: string | number, title: string, anchorId: string, meta?: Record<string, any>) => {
         setCurrentPlayingId(id);
+        updateHash(anchorId);
         if (trackEvent) {
-            trackEvent('Music Started', { track: title });
+            trackEvent('Music Started', { track: title, ...meta });
         }
     };
 
@@ -29,8 +38,17 @@ const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
                 top: offsetPosition,
                 behavior: "smooth"
             });
+            updateHash(id);
         }
     };
+
+    React.useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const hash = window.location.hash || '';
+        if (!hash.startsWith('#track-')) return;
+        const targetId = hash.slice(1);
+        requestAnimationFrame(() => scrollToTrack(targetId));
+    }, [albums]);
 
     return (
         <div className="pt-32 pb-40 px-6 max-w-7xl mx-auto view-transition relative">
@@ -160,14 +178,23 @@ const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
                                     {album.tracks.map((track, ti) => {
                                         const uniqueKey = track.id || `${album.id}-${ti}`;
                                         const scrollId = `track-${album.id}-${ti}`;
+                                        const trackMeta = {
+                                            album_id: album.id,
+                                            album_title: album.title,
+                                            track_id: uniqueKey,
+                                            track_title: track.title,
+                                            track_index: ti + 1,
+                                            track_anchor: scrollId
+                                        };
                                         return (
                                             <div id={scrollId} key={uniqueKey} className="scroll-mt-32 transition-colors duration-500">
                                                 <AudioPlayer
                                                     track={track}
                                                     index={ti}
                                                     isCurrentTrack={currentPlayingId === uniqueKey}
-                                                    onPlayRequest={() => handlePlayRequest(uniqueKey, track.title)}
+                                                    onPlayRequest={() => handlePlayRequest(uniqueKey, track.title, scrollId, trackMeta)}
                                                     trackEvent={trackEvent}
+                                                    trackMeta={trackMeta}
                                                 />
                                             </div>
                                         );

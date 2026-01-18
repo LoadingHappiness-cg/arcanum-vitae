@@ -15,9 +15,10 @@ interface AudioPlayerProps {
   isCurrentTrack?: boolean;
   onPlayRequest?: () => void;
   trackEvent?: (name: string, data?: any) => void;
+  trackMeta?: Record<string, any>;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack = false, onPlayRequest, trackEvent }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack = false, onPlayRequest, trackEvent, trackMeta }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -59,7 +60,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack 
     if (percentage >= 50 && !reachedMilestone) {
       setReachedMilestone(true);
       if (trackEvent) {
-        trackEvent('Music Milestone 50%', { track: track.title });
+        trackEvent('Music Milestone 50%', { track: track.title, ...trackMeta, milestone: 50 });
       }
     }
   };
@@ -67,7 +68,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ track, index, isCurrentTrack 
   const handleEnded = () => {
     setIsPlaying(false);
     if (trackEvent) {
-      trackEvent('Music Completed', { track: track.title });
+      trackEvent('Music Completed', { track: track.title, ...trackMeta });
     }
   };
 

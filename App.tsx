@@ -162,10 +162,38 @@ const App: React.FC = () => {
   const [analyticsContent, setAnalyticsContent] = useState(INITIAL_ANALYTICS_CONTENT);
 
   // Umami Event Tracking Utility
+  const toGaEventName = (name: string) => (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 40) || 'event'
+  );
+
   const trackEvent = (eventName: string, data?: any) => {
+    const payload = data ? { ...data } : {};
     if ((window as any).umami && typeof (window as any).umami.track === 'function') {
-      (window as any).umami.track(eventName, data);
+      (window as any).umami.track(eventName, payload);
     }
+    const gtag = (window as any).gtag;
+    if (typeof gtag === 'function') {
+      gtag('event', toGaEventName(eventName), {
+        event_label: eventName,
+        ...payload,
+      });
+    }
+  };
+
+  const trackPageView = (view: View) => {
+    const gtag = (window as any).gtag;
+    if (typeof gtag !== 'function') return;
+    const pagePath = `/${view}`;
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    gtag('event', 'page_view', {
+      page_title: view,
+      page_path: hash ? `${pagePath}${hash}` : pagePath,
+      page_location: typeof window !== 'undefined' ? window.location.href : undefined,
+    });
   };
 
   const resolveUmamiScriptUrl = () => {
@@ -310,6 +338,19 @@ const App: React.FC = () => {
   useEffect(() => {
     applyAnalyticsScripts();
   }, [analyticsContent]);
+
+  useEffect(() => {
+    trackPageView(currentView);
+  }, [currentView, analyticsContent]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash || '';
+    if (hash.startsWith('#track-')) {
+      setCurrentView(View.MUSIC);
+      setIsEntered(true);
+    }
+  }, []);
 
   const navigate = (view: View) => {
     setIsTransitioning(true);
