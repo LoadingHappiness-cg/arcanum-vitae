@@ -1,5 +1,7 @@
 import express from 'express';
-import fileUpload from 'express-fileupload';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const fileUpload = require('express-fileupload');
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
