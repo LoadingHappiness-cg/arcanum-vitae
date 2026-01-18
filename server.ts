@@ -1,12 +1,33 @@
 import express from 'express';
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const fileUpload = require('express-fileupload');
-import cors from 'cors';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+console.log('--- DIAGNOSTIC START ---');
+console.log('CWD:', process.cwd());
+console.log('DIRNAME:', __dirname);
+console.log('NODE:', process.version);
+
+const require = createRequire(import.meta.url);
+let fileUpload;
+try {
+    fileUpload = require(path.join(__dirname, 'node_modules', 'express-fileupload', 'lib', 'index.js'));
+    console.log('express-fileupload loaded via absolute path.');
+} catch (e) {
+    try {
+        fileUpload = require('express-fileupload');
+        console.log('express-fileupload loaded via standard resolution.');
+    } catch (e2) {
+        console.error('CRITICAL: Could not find express-fileupload.');
+    }
+}
+
+import cors from 'cors';
 import fs from 'fs';
 import crypto from 'crypto';
-import { fileURLToPath } from 'url';
 import { GoogleGenAI } from "@google/genai";
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -23,9 +44,6 @@ process.on('uncaughtException', (err) => {
     process.exit(1);
 });
 
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const DATA_PATH = path.join(__dirname, 'data', 'db.json');
 
