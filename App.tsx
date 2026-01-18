@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { View, Album, WordFragment, VisualItem, FictionDeclaration, AiDeclaration, HumanIdentity, Track, LegalContent, HomeContent, AnalyticsContent } from './types';
 import Navigation from './components/Navigation';
@@ -184,16 +184,40 @@ const App: React.FC = () => {
     }
   };
 
+  const umamiLastPathRef = useRef<string | null>(null);
+
+  const resolvePagePath = (view: View) => {
+    const basePath = view === View.HOME ? '/' : `/${view}`;
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    return hash ? `${basePath}${hash}` : basePath;
+  };
+
   const trackPageView = (view: View) => {
     const gtag = (window as any).gtag;
     if (typeof gtag !== 'function') return;
-    const pagePath = `/${view}`;
-    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    const pagePath = resolvePagePath(view);
     gtag('event', 'page_view', {
       page_title: view,
-      page_path: hash ? `${pagePath}${hash}` : pagePath,
+      page_path: pagePath,
       page_location: typeof window !== 'undefined' ? window.location.href : undefined,
     });
+  };
+
+  const trackUmamiView = (view: View) => {
+    const umami = (window as any).umami;
+    if (!umami || typeof umami.trackView !== 'function') return;
+    const pagePath = resolvePagePath(view);
+    if (umamiLastPathRef.current === pagePath) return;
+    try {
+      umami.trackView(pagePath);
+    } catch (error) {
+      try {
+        umami.trackView({ url: pagePath, title: document.title, referrer: document.referrer || undefined });
+      } catch (innerError) {
+        console.warn('Failed to send Umami view:', innerError);
+      }
+    }
+    umamiLastPathRef.current = pagePath;
   };
 
   const resolveUmamiScriptUrl = () => {
@@ -341,6 +365,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     trackPageView(currentView);
+    trackUmamiView(currentView);
   }, [currentView, analyticsContent]);
 
   useEffect(() => {
