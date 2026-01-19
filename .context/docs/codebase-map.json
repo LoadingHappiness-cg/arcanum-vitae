@@ -1,0 +1,561 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-01-19T18:40:36.337Z",
+  "stack": {
+    "primaryLanguage": "typescript",
+    "languages": [
+      "javascript",
+      "typescript"
+    ],
+    "frameworks": [],
+    "buildTools": [
+      "vite",
+      "docker"
+    ],
+    "testFrameworks": [],
+    "packageManager": "npm",
+    "isMonorepo": false,
+    "hasDocker": true,
+    "hasCI": false
+  },
+  "structure": {
+    "totalFiles": 44,
+    "topDirectories": [
+      {
+        "name": "AGENTS.md",
+        "fileCount": 1
+      },
+      {
+        "name": "App.tsx",
+        "fileCount": 1
+      },
+      {
+        "name": "components",
+        "fileCount": 12
+      },
+      {
+        "name": "constants.tsx",
+        "fileCount": 1
+      },
+      {
+        "name": "data",
+        "fileCount": 0
+      },
+      {
+        "name": "deploy-lxc.sh",
+        "fileCount": 1
+      },
+      {
+        "name": "Dockerfile",
+        "fileCount": 1
+      },
+      {
+        "name": "ecosystem.config.cjs",
+        "fileCount": 1
+      },
+      {
+        "name": "index.css",
+        "fileCount": 1
+      },
+      {
+        "name": "index.html",
+        "fileCount": 1
+      },
+      {
+        "name": "index.tsx",
+        "fileCount": 1
+      },
+      {
+        "name": "metadata.json",
+        "fileCount": 1
+      },
+      {
+        "name": "package-lock.json",
+        "fileCount": 1
+      },
+      {
+        "name": "package.json",
+        "fileCount": 1
+      },
+      {
+        "name": "public",
+        "fileCount": 14
+      },
+      {
+        "name": "README.md",
+        "fileCount": 1
+      },
+      {
+        "name": "server.ts",
+        "fileCount": 1
+      },
+      {
+        "name": "services",
+        "fileCount": 1
+      },
+      {
+        "name": "tsconfig.json",
+        "fileCount": 1
+      },
+      {
+        "name": "types.ts",
+        "fileCount": 1
+      },
+      {
+        "name": "vite.config.ts",
+        "fileCount": 1
+      }
+    ],
+    "languageDistribution": [
+      {
+        "extension": ".tsx",
+        "count": 15
+      },
+      {
+        "extension": ".json",
+        "count": 5
+      },
+      {
+        "extension": ".txt",
+        "count": 5
+      },
+      {
+        "extension": ".png",
+        "count": 5
+      },
+      {
+        "extension": ".ts",
+        "count": 4
+      },
+      {
+        "extension": ".md",
+        "count": 2
+      },
+      {
+        "extension": ".html",
+        "count": 1
+      },
+      {
+        "extension": ".css",
+        "count": 1
+      },
+      {
+        "extension": ".cjs",
+        "count": 1
+      },
+      {
+        "extension": ".sh",
+        "count": 1
+      }
+    ]
+  },
+  "architecture": {
+    "layers": [
+      {
+        "name": "Services",
+        "description": "Business logic and orchestration",
+        "directories": [
+          "services"
+        ],
+        "symbolCount": 3,
+        "dependsOn": []
+      },
+      {
+        "name": "Components",
+        "description": "UI components and views",
+        "directories": [
+          "components",
+          "components/views"
+        ],
+        "symbolCount": 11,
+        "dependsOn": [
+          "Services"
+        ]
+      }
+    ],
+    "patterns": [],
+    "entryPoints": [
+      "server.ts",
+      "index.tsx"
+    ]
+  },
+  "symbols": {
+    "classes": [],
+    "interfaces": [
+      {
+        "name": "AiDeclaration",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 59,
+        "exported": true
+      },
+      {
+        "name": "Album",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 14,
+        "exported": true
+      },
+      {
+        "name": "AnalyticsContent",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 94,
+        "exported": true
+      },
+      {
+        "name": "ArchiveItem",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 45,
+        "exported": true
+      },
+      {
+        "name": "FictionDeclaration",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 53,
+        "exported": true
+      },
+      {
+        "name": "HomeContent",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 85,
+        "exported": true
+      },
+      {
+        "name": "HumanIdentity",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 65,
+        "exported": true
+      },
+      {
+        "name": "LegalContent",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 79,
+        "exported": true
+      },
+      {
+        "name": "LegalSection",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 72,
+        "exported": true
+      },
+      {
+        "name": "Track",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 25,
+        "exported": true
+      },
+      {
+        "name": "VisualItem",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 38,
+        "exported": true
+      },
+      {
+        "name": "WordFragment",
+        "kind": "interface",
+        "file": "types.ts",
+        "line": 32,
+        "exported": true
+      },
+      {
+        "name": "AboutViewProps",
+        "kind": "interface",
+        "file": "components/views/AboutView.tsx",
+        "line": 6,
+        "exported": false
+      },
+      {
+        "name": "AudioPlayerProps",
+        "kind": "interface",
+        "file": "components/AudioPlayer.tsx",
+        "line": 12,
+        "exported": false
+      },
+      {
+        "name": "HomeViewProps",
+        "kind": "interface",
+        "file": "components/views/HomeView.tsx",
+        "line": 6,
+        "exported": false
+      },
+      {
+        "name": "LegalViewProps",
+        "kind": "interface",
+        "file": "components/views/LegalView.tsx",
+        "line": 5,
+        "exported": false
+      },
+      {
+        "name": "Member",
+        "kind": "interface",
+        "file": "components/BandPortraits.tsx",
+        "line": 5,
+        "exported": false
+      },
+      {
+        "name": "MusicViewProps",
+        "kind": "interface",
+        "file": "components/views/MusicView.tsx",
+        "line": 6,
+        "exported": false
+      },
+      {
+        "name": "NavProps",
+        "kind": "interface",
+        "file": "components/Navigation.tsx",
+        "line": 5,
+        "exported": false
+      },
+      {
+        "name": "ResistanceArchiveProps",
+        "kind": "interface",
+        "file": "components/ResistanceArchive.tsx",
+        "line": 5,
+        "exported": false
+      },
+      {
+        "name": "TheMirrorProps",
+        "kind": "interface",
+        "file": "components/TheMirror.tsx",
+        "line": 5,
+        "exported": false
+      },
+      {
+        "name": "VisualsViewProps",
+        "kind": "interface",
+        "file": "components/views/VisualsView.tsx",
+        "line": 5,
+        "exported": false
+      },
+      {
+        "name": "WordsViewProps",
+        "kind": "interface",
+        "file": "components/views/WordsView.tsx",
+        "line": 6,
+        "exported": false
+      }
+    ],
+    "functions": [
+      {
+        "name": "curateSubmission",
+        "kind": "function",
+        "file": "services/gemini.ts",
+        "line": 17,
+        "exported": true
+      },
+      {
+        "name": "generateBandPortrait",
+        "kind": "function",
+        "file": "services/gemini.ts",
+        "line": 32,
+        "exported": true
+      },
+      {
+        "name": "getMirrorReflection",
+        "kind": "function",
+        "file": "services/gemini.ts",
+        "line": 2,
+        "exported": true
+      }
+    ],
+    "types": [],
+    "enums": [
+      {
+        "name": "View",
+        "kind": "enum",
+        "file": "types.ts",
+        "line": 2,
+        "exported": true
+      }
+    ]
+  },
+  "publicAPI": [
+    {
+      "name": "AiDeclaration",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 59,
+      "exported": true
+    },
+    {
+      "name": "Album",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 14,
+      "exported": true
+    },
+    {
+      "name": "AnalyticsContent",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 94,
+      "exported": true
+    },
+    {
+      "name": "ArchiveItem",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 45,
+      "exported": true
+    },
+    {
+      "name": "curateSubmission",
+      "kind": "function",
+      "file": "services/gemini.ts",
+      "line": 17,
+      "exported": true
+    },
+    {
+      "name": "FictionDeclaration",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 53,
+      "exported": true
+    },
+    {
+      "name": "generateBandPortrait",
+      "kind": "function",
+      "file": "services/gemini.ts",
+      "line": 32,
+      "exported": true
+    },
+    {
+      "name": "getMirrorReflection",
+      "kind": "function",
+      "file": "services/gemini.ts",
+      "line": 2,
+      "exported": true
+    },
+    {
+      "name": "HomeContent",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 85,
+      "exported": true
+    },
+    {
+      "name": "HumanIdentity",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 65,
+      "exported": true
+    },
+    {
+      "name": "LegalContent",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 79,
+      "exported": true
+    },
+    {
+      "name": "LegalSection",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 72,
+      "exported": true
+    },
+    {
+      "name": "Track",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 25,
+      "exported": true
+    },
+    {
+      "name": "VisualItem",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 38,
+      "exported": true
+    },
+    {
+      "name": "WordFragment",
+      "kind": "interface",
+      "file": "types.ts",
+      "line": 32,
+      "exported": true
+    }
+  ],
+  "dependencies": {
+    "mostImported": [
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/types.ts",
+        "importedBy": 10
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/constants.tsx",
+        "importedBy": 6
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/services/gemini.ts",
+        "importedBy": 2
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/App.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/Navigation.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/TheMirror.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/ResistanceArchive.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/AdminDashboard.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/views/HomeView.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/views/MusicView.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/views/WordsView.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/views/VisualsView.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/views/AboutView.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/views/LegalView.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/AudioPlayer.tsx",
+        "importedBy": 1
+      },
+      {
+        "file": "/Users/carlosgavela/Projectos/arcanum-vitae/components/BandPortraits.tsx",
+        "importedBy": 1
+      }
+    ]
+  },
+  "stats": {
+    "totalSymbols": 27,
+    "exportedSymbols": 16,
+    "analysisTimeMs": 122
+  }
+}
