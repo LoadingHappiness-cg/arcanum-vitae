@@ -804,6 +804,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
                 <textarea
                   className="w-full bg-black border border-stone-800 p-4 font-serif-brutal italic text-xl text-stone-300 focus:outline-none focus:border-red-900"
                   value={frag.text}
+                  placeholder="FRAGMENT_TEXT"
                   onChange={(e) => {
                     const newFrags = [...localData.fragments];
                     newFrags[i].text = e.target.value;
@@ -991,6 +992,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
                         <input
                           className="bg-transparent font-bold text-stone-200 border-b border-stone-800 focus:outline-none uppercase"
                           value={track.title}
+                          placeholder="TRACK_TITLE"
                           onChange={(e) => {
                             const newAlbums = [...localData.albums];
                             newAlbums[ai].tracks[ti].title = e.target.value;
@@ -1099,6 +1101,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onSave, onExit, t
                   className="hidden"
                   accept={browserSelection.type === 'audio' ? 'audio/*' : 'image/*'}
                   onChange={handleUpload}
+                  aria-label={`Upload ${browserSelection.type} file`}
+                  title={`Upload ${browserSelection.type} file`}
                 />
               </div>
               <button
