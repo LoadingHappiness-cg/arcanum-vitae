@@ -4,12 +4,20 @@ Allow: /
 # Sitemap location
 Sitemap: https://arcanumvitae.art/sitemap.xml
 
-# AI crawler friendly bits
+# AI / LLM crawler friendly bits
 User-agent: GPTBot
 Allow: /
 User-agent: ChatGPT-User
 Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
 User-agent: PerplexityBot
 Allow: /
 User-agent: ClaudeBot
+Allow: /
+User-agent: CohereBot
+Allow: /
+User-agent: YouBot
 Allow: /

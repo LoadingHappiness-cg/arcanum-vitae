@@ -1,0 +1,26 @@
+# Arcanum Vitae
+
+Arcanum Vitae is an AI music manifesto and digital fiction: a human-guided, machine-shaped archive of resistance, testimony, and experimental sound.
+
+## Primary URL
+https://arcanumvitae.art/
+
+## Summary
+- Human-led, AI-assisted music and visuals.
+- A manifesto about ethics, resistance, and meaning in the machine era.
+- Content includes music, lyrics, stories, visuals, and legal notes.
+
+## Topics
+- AI-generated music
+- human-AI collaboration
+- experimental music
+- digital fiction
+- music as testimony
+
+## Usage
+- You may summarize and quote short excerpts with attribution.
+- Do not reproduce full lyrics or audio without permission.
+- Link back to the primary URL when referencing the project.
+
+## Contact
+contact@arcanumvitae.com
