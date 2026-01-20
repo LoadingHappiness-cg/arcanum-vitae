@@ -170,14 +170,14 @@ export const INITIAL_HOME_CONTENT: HomeContent = {
 
 export const INITIAL_ANALYTICS_CONTENT: AnalyticsContent = {
   umami: {
-    enabled: false,
-    websiteId: '',
-    srcUrl: 'https://cloud.umami.is/script.js',
-    domains: ''
+    enabled: true,
+    websiteId: '6f47624d-4ddd-4e4d-83de-76abae1920d1',
+    srcUrl: '/umami/script.js',
+    domains: 'arcanumvitae.art'
   },
   googleAnalytics: {
-    enabled: false,
-    measurementId: ''
+    enabled: true,
+    measurementId: 'G-ZJCQRQP0Q8'
   }
 };
 

@@ -455,13 +455,26 @@ app.post('/api/mirror', requireAdmin, async (req, res) => {
     const { input } = req.body;
 
     try {
-        const model = (genAI as any).getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = `Mirror system prompt... Input: ${input}`;
-        const result = await model.generateContent(prompt);
-        res.json({ text: result.response.text() });
+
+        // Enabling streaming for a more responsive UI
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Transfer-Encoding', 'chunked');
+
+        const result = await model.generateContentStream(prompt);
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            res.write(chunkText);
+        }
+        res.end();
     } catch (error) {
         console.error("Mirror proxy failed:", error);
-        res.status(500).json({ error: "Reflection failed" });
+        if (!res.headersSent) {
+            res.status(500).json({ error: "Reflection failed" });
+        } else {
+            res.end();
+        }
     }
 });
 
@@ -470,12 +483,24 @@ app.post('/api/curate', requireAdmin, async (req, res) => {
     const { input } = req.body;
 
     try {
-        const model = (genAI as any).getGenerativeModel({ model: "gemini-1.5-flash" });
-        const result = await model.generateContent(input);
-        res.json({ text: result.response.text() });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Transfer-Encoding', 'chunked');
+
+        const result = await model.generateContentStream(input);
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            res.write(chunkText);
+        }
+        res.end();
     } catch (error) {
         console.error("Curation proxy failed:", error);
-        res.status(500).json({ error: "Curation failed" });
+        if (!res.headersSent) {
+            res.status(500).json({ error: "Curation failed" });
+        } else {
+            res.end();
+        }
     }
 });
 

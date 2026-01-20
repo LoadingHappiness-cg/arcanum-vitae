@@ -24,111 +24,22 @@ import {
   INITIAL_ANALYTICS_CONTENT
 } from './constants';
 
-const isRecord = (value: unknown): value is Record<string, unknown> => (
-  typeof value === 'object' && value !== null && !Array.isArray(value)
-);
-
-const isString = (value: unknown): value is string => typeof value === 'string';
-const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean';
-
-const isTrack = (value: unknown): value is Track => (
-  isRecord(value) &&
-  isString(value.title) &&
-  isString(value.lyrics) &&
-  isString(value.story) &&
-  isString(value.audioUrl)
-);
-
-const isAlbum = (value: unknown): value is Album => (
-  isRecord(value) &&
-  isString(value.id) &&
-  isString(value.title) &&
-  isString(value.year) &&
-  isString(value.concept) &&
-  isString(value.context) &&
-  isString(value.coverUrl) &&
-  Array.isArray(value.tracks) &&
-  value.tracks.every(isTrack) &&
-  (value.isUpcoming === undefined || value.isUpcoming === null || isBoolean(value.isUpcoming))
-);
-
-const isFragment = (value: unknown): value is WordFragment => (
-  isRecord(value) &&
-  isString(value.id) &&
-  isString(value.text) &&
-  (value.source === undefined || isString(value.source))
-);
-
-const isVisual = (value: unknown): value is VisualItem => (
-  isRecord(value) &&
-  isString(value.id) &&
-  isString(value.url) &&
-  isString(value.title) &&
-  isString(value.description)
-);
-
-const isDeclaration = (value: unknown): value is FictionDeclaration => (
-  isRecord(value) &&
-  isString(value.main) &&
-  isString(value.details) &&
-  isString(value.tagline)
-);
-
-const isAiDeclaration = (value: unknown): value is AiDeclaration => (
-  isRecord(value) &&
-  isString(value.main) &&
-  Array.isArray(value.body) &&
-  value.body.every(isString) &&
-  isString(value.tagline)
-);
-
-const isHumanIdentity = (value: unknown): value is HumanIdentity => (
-  isRecord(value) &&
-  isString(value.footerQuote) &&
-  isString(value.originLabel) &&
-  isString(value.veritasName) &&
-  isString(value.veritasLink)
-);
-
-const isLegalSection = (value: unknown) => (
-  isRecord(value) &&
-  isString(value.id) &&
-  isString(value.title) &&
-  isString(value.body) &&
-  (value.list === undefined || (Array.isArray(value.list) && value.list.every(isString)))
-);
-
-const isLegalContent = (value: unknown): value is LegalContent => (
-  isRecord(value) &&
-  isString(value.heading) &&
-  isString(value.footer) &&
-  Array.isArray(value.sections) &&
-  value.sections.every(isLegalSection)
-);
-
-const isHomeContent = (value: unknown): value is HomeContent => (
-  isRecord(value) &&
-  isString(value.galleryMessage) &&
-  Array.isArray(value.galleryItems) &&
-  value.galleryItems.every((item) => (
-    isRecord(item) &&
-    isString(item.id) &&
-    isString(item.title) &&
-    isString(item.manifesto)
-  ))
-);
-
-const isAnalyticsContent = (value: unknown): value is AnalyticsContent => (
-  isRecord(value) &&
-  isRecord(value.umami) &&
-  typeof value.umami.enabled === 'boolean' &&
-  isString(value.umami.websiteId) &&
-  isString(value.umami.srcUrl) &&
-  (value.umami.domains === undefined || isString(value.umami.domains)) &&
-  isRecord(value.googleAnalytics) &&
-  typeof value.googleAnalytics.enabled === 'boolean' &&
-  isString(value.googleAnalytics.measurementId)
-);
+import {
+  isRecord,
+  isString,
+  isBoolean,
+  isTrack,
+  isAlbum,
+  isFragment,
+  isVisual,
+  isDeclaration,
+  isAiDeclaration,
+  isHumanIdentity,
+  isLegalSection,
+  isLegalContent,
+  isHomeContent,
+  isAnalyticsContent
+} from './services/validation';
 
 const readLocalJson = <T,>(key: string, validator: (value: unknown) => value is T): T | null => {
   const raw = localStorage.getItem(key);
