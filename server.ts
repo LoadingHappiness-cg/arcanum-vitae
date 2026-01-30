@@ -61,6 +61,8 @@ app.use(helmet({
             "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.tailwindcss.com"],
             "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
             "img-src": ["'self'", "data:", "https://images.unsplash.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://grainy-gradients.vercel.app"],
+            // Allow external audio hosts used in track audioUrl (fallback/demo).
+            "media-src": ["'self'", "https://www.soundhelix.com"],
             "connect-src": ["'self'", "https://cloud.umami.is", "https://www.google-analytics.com", "https://analytics.google.com", "https://cloudflareinsights.com"],
         },
     },
