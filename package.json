@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "tsx scripts/generate-seo.ts",
     "build": "vite build",
     "preview": "vite preview",
     "start": "tsx server.ts"
@@ -18,7 +19,9 @@
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.13.0",
+    "vite-prerender-plugin": "^0.5.12"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

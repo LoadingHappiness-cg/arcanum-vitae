@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://arcanumvitae.art/</loc>
-    <lastmod>2026-01-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://arcanumvitae.art/</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/words</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/visuals</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/archive</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/about</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/legal</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/unnamed-album</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/unnamed-album/1</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/1</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/2</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/3</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/4</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/5</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/6</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/7</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/8</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/9</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
+  <url><loc>https://arcanumvitae.art/music/rivers-of-resistance/10</loc><lastmod>2026-01-30T19:19:45.339Z</lastmod></url>
 </urlset>

@@ -6,9 +6,10 @@ import AudioPlayer from '../AudioPlayer';
 interface MusicViewProps {
     albums: Album[];
     trackEvent?: (name: string, data?: any) => void;
+    initialScrollId?: string | null;
 }
 
-const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
+const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent, initialScrollId }) => {
     const [currentPlayingId, setCurrentPlayingId] = React.useState<string | number | null>(null);
 
     const updateHash = (id: string) => {
@@ -44,11 +45,20 @@ const MusicView: React.FC<MusicViewProps> = ({ albums, trackEvent }) => {
 
     React.useEffect(() => {
         if (typeof window === 'undefined') return;
+
+        // 1) Route-driven scroll (preferred)
+        if (initialScrollId && initialScrollId.startsWith('track-')) {
+            const targetId = initialScrollId;
+            requestAnimationFrame(() => scrollToTrack(targetId));
+            return;
+        }
+
+        // 2) Back-compat: hash-driven scroll
         const hash = window.location.hash || '';
         if (!hash.startsWith('#track-')) return;
         const targetId = hash.slice(1);
         requestAnimationFrame(() => scrollToTrack(targetId));
-    }, [albums]);
+    }, [albums, initialScrollId]);
 
     return (
         <div className="pt-32 pb-40 px-6 max-w-7xl mx-auto view-transition relative">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate as useRRNavigate } from 'react-router-dom';
 
 import { View, Album, WordFragment, VisualItem, FictionDeclaration, AiDeclaration, HumanIdentity, Track, LegalContent, HomeContent, AnalyticsContent } from './types';
 import Navigation from './components/Navigation';
@@ -55,10 +56,15 @@ const readLocalJson = <T,>(key: string, validator: (value: unknown) => value is 
 };
 
 const App: React.FC = () => {
+  const location = useLocation();
+  const rrNavigate = useRRNavigate();
+
   const [currentView, setCurrentView] = useState<View>(View.HOME);
   const [isEntered, setIsEntered] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [musicInitialScrollId, setMusicInitialScrollId] = useState<string | null>(null);
 
   // Persistent State for dynamic content
   const [albums, setAlbums] = useState<Album[]>(INITIAL_ALBUMS);
@@ -279,6 +285,49 @@ const App: React.FC = () => {
     trackUmamiView(currentView);
   }, [currentView, analyticsContent]);
 
+  // Route-driven navigation (SEO + shareable URLs)
+  useEffect(() => {
+    const pathname = location.pathname || '/';
+
+    // Default: clear any targeted scroll
+    setMusicInitialScrollId(null);
+
+    // Music deep links:
+    // - /music
+    // - /music/:albumId
+    // - /music/:albumId/:trackNo (1-based)
+    if (pathname === '/music' || pathname.startsWith('/music/')) {
+      setIsEntered(true);
+      setCurrentView(View.MUSIC);
+
+      const parts = pathname.split('/').filter(Boolean); // ['music', 'albumId', 'trackNo?']
+      const albumId = parts[1];
+      const trackNoRaw = parts[2];
+      const trackNo = trackNoRaw ? Number(trackNoRaw) : NaN;
+      if (albumId && Number.isFinite(trackNo) && trackNo > 0) {
+        const idx = trackNo - 1; // convert to 0-based
+        setMusicInitialScrollId(`track-${albumId}-${idx}`);
+      }
+      return;
+    }
+
+    // Other views
+    const map: Record<string, View> = {
+      '/': View.HOME,
+      '/words': View.WORDS,
+      '/visuals': View.VISUALS,
+      '/archive': View.ARCHIVE,
+      '/about': View.ABOUT,
+      '/legal': View.LEGAL,
+      '/admin': View.ADMIN,
+    };
+
+    const nextView = map[pathname] || View.HOME;
+    setCurrentView(nextView);
+    if (pathname !== '/') setIsEntered(true);
+  }, [location.pathname]);
+
+  // Back-compat: hash-driven deep link
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const hash = window.location.hash || '';
@@ -288,11 +337,29 @@ const App: React.FC = () => {
     }
   }, []);
 
+  const viewToPath = (view: View) => {
+    switch (view) {
+      case View.HOME: return '/';
+      case View.MUSIC: return '/music';
+      case View.WORDS: return '/words';
+      case View.VISUALS: return '/visuals';
+      case View.ARCHIVE: return '/archive';
+      case View.ABOUT: return '/about';
+      case View.LEGAL: return '/legal';
+      case View.ADMIN: return '/admin';
+      case View.MIRROR: return '/mirror';
+      default: return '/';
+    }
+  };
+
   const navigate = (view: View) => {
     setIsTransitioning(true);
     trackEvent('View Changed', { view });
+    const path = viewToPath(view);
     setTimeout(() => {
+      rrNavigate(path);
       setCurrentView(view);
+      if (view !== View.HOME) setIsEntered(true);
       setIsTransitioning(false);
     }, 400);
   };
@@ -349,7 +416,7 @@ const App: React.FC = () => {
     }
 
     switch (currentView) {
-      case View.MUSIC: return <MusicView albums={albums} trackEvent={trackEvent} />;
+      case View.MUSIC: return <MusicView albums={albums} trackEvent={trackEvent} initialScrollId={musicInitialScrollId} />;
       case View.WORDS: return <WordsView fragments={fragments} />;
       case View.VISUALS: return <VisualsView visuals={visuals} />;
       case View.ABOUT: return (
