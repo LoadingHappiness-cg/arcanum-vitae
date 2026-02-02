@@ -38,7 +38,11 @@ fs.writeFileSync(routesOutPath, JSON.stringify({ routes }, null, 2));
 const sitemapPath = path.join(projectRoot, 'public', 'sitemap.xml');
 const urls = routes
   .filter((r) => !r.includes(':'))
-  .map((r) => `${BASE_URL}${r === '/' ? '/' : r}`);
+  .map((r) => {
+    if (r === '/') return `${BASE_URL}/`;
+    const path = r.endsWith('/') ? r : `${r}/`;
+    return `${BASE_URL}${path}`;
+  });
 
 const now = new Date().toISOString();
 const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +

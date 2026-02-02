@@ -75,7 +75,12 @@ const buildMetaForUrl = (url: string) => {
     }
   }
 
-  const canonical = `${BASE_URL}${path === '/' ? '/' : path}`;
+  const canonicalPath =
+    path === '/'
+      ? '/'
+      : (path.endsWith('/') ? path : `${path}/`);
+
+  const canonical = `${BASE_URL}${canonicalPath}`;
 
   return { title, description, image, canonical, path };
 };
