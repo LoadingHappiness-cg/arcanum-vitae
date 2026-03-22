@@ -89,15 +89,25 @@ const App: React.FC = () => {
 
   const trackEvent = (eventName: string, data?: any) => {
     const payload = data ? { ...data } : {};
+    // Track with Umami (primary analytics)
     if ((window as any).umami && typeof (window as any).umami.track === 'function') {
-      (window as any).umami.track(eventName, payload);
+      try {
+        (window as any).umami.track(eventName, payload);
+      } catch (e) {
+        // Silently fail - analytics should not break UX
+      }
     }
+    // Also track with GA for redundancy
     const gtag = (window as any).gtag;
     if (typeof gtag === 'function') {
-      gtag('event', toGaEventName(eventName), {
-        event_label: eventName,
-        ...payload,
-      });
+      try {
+        gtag('event', toGaEventName(eventName), {
+          event_label: eventName,
+          ...payload,
+        });
+      } catch (e) {
+        // Silently fail
+      }
     }
   };
 
@@ -110,44 +120,39 @@ const App: React.FC = () => {
   };
 
   const trackPageView = (view: View) => {
-    const gtag = (window as any).gtag;
-    if (typeof gtag !== 'function') return;
     const pagePath = resolvePagePath(view);
-    gtag('event', 'page_view', {
-      page_title: view,
-      page_path: pagePath,
-      page_location: typeof window !== 'undefined' ? window.location.href : undefined,
-    });
+    const pageLocation = typeof window !== 'undefined' ? window.location.href : undefined;
+    
+    // Google Analytics
+    const gtag = (window as any).gtag;
+    if (typeof gtag === 'function') {
+      try {
+        gtag('event', 'page_view', {
+          page_title: view,
+          page_path: pagePath,
+          page_location: pageLocation,
+        });
+      } catch (e) {
+        // Silently fail
+      }
+    }
   };
 
   const trackUmamiView = (view: View) => {
     const umami = (window as any).umami;
-    if (!umami || typeof umami.trackView !== 'function') return;
+    if (!umami) return;
+    
     const pagePath = resolvePagePath(view);
     if (umamiLastPathRef.current === pagePath) return;
-    try {
-      umami.trackView(pagePath);
-    } catch (error) {
-      try {
-        umami.trackView({ url: pagePath, title: document.title, referrer: document.referrer || undefined });
-      } catch (innerError) {
-        console.warn('Failed to send Umami view:', innerError);
-      }
-    }
+    
+    // Umami auto-tracks page views when script loads
+    // We just need to ensure the script is loaded with correct config
     umamiLastPathRef.current = pagePath;
   };
 
   const resolveUmamiScriptUrl = () => {
-    const fallback = 'https://cloud.umami.is/script.js';
-    const raw = (analyticsContent.umami.srcUrl || '').trim();
-    if (!raw) return fallback;
-    if (raw.includes('/api/send')) {
-      return raw.replace(/\/api\/send.*$/, '/script.js');
-    }
-    if (raw.endsWith('/')) {
-      return `${raw}script.js`;
-    }
-    return raw;
+    // Always use the proxy endpoint for consistency and to avoid CORS/redirect issues
+    return '/umami/script.js';
   };
 
   const applyAnalyticsScripts = () => {
@@ -162,6 +167,7 @@ const App: React.FC = () => {
     removeById('ga-script');
     removeById('ga-inline');
 
+    // Umami - Primary analytics (privacy-focused)
     if (analyticsContent.umami.enabled && analyticsContent.umami.websiteId) {
       const script = document.createElement('script');
       script.id = 'umami-script';
@@ -171,14 +177,22 @@ const App: React.FC = () => {
       if (analyticsContent.umami.domains) {
         script.setAttribute('data-domains', analyticsContent.umami.domains);
       }
+      // Add error handling for script load failure
+      script.onerror = () => {
+        console.warn('Umami script failed to load, falling back to cloud');
+        // Fallback to cloud.umami.is
+        script.src = `https://cloud.umami.is/script.js`;
+      };
       document.head.appendChild(script);
     }
 
+    // Google Analytics - Secondary/redundancy
     if (analyticsContent.googleAnalytics.enabled && analyticsContent.googleAnalytics.measurementId) {
       const gaScript = document.createElement('script');
       gaScript.id = 'ga-script';
       gaScript.async = true;
       gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${analyticsContent.googleAnalytics.measurementId}`;
+      gaScript.onerror = () => console.warn('GA script failed to load');
       document.head.appendChild(gaScript);
 
       const inline = document.createElement('script');
@@ -187,7 +201,9 @@ const App: React.FC = () => {
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '${analyticsContent.googleAnalytics.measurementId}');
+        gtag('config', '${analyticsContent.googleAnalytics.measurementId}', {
+          send_page_view: false
+        });
       `;
       document.head.appendChild(inline);
     }

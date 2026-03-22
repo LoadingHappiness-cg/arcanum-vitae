@@ -63,7 +63,7 @@ app.use(helmet({
             "img-src": ["'self'", "data:", "https://images.unsplash.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://grainy-gradients.vercel.app"],
             // Allow external audio hosts used in track audioUrl (fallback/demo).
             "media-src": ["'self'", "https://www.soundhelix.com"],
-            "connect-src": ["'self'", "https://cloud.umami.is", "https://www.google-analytics.com", "https://analytics.google.com", "https://cloudflareinsights.com"],
+            "connect-src": ["'self'", "https://cloud.umami.is", "https://www.google-analytics.com", "https://analytics.google.com", "https://cloudflareinsights.com", "blob:", "*"],
         },
     },
 }));
@@ -110,6 +110,23 @@ const authLimiter = rateLimit({
 
 app.use('/api/', generalLimiter);
 app.use('/api/auth', authLimiter);
+
+// Trailing Slash Redirects - Ensure URL consistency for SEO
+// This prevents duplicate content issues and redirect loops
+app.use((req, res, next) => {
+    // Skip API routes and files with extensions
+    if (req.path.startsWith('/api/') || req.path.includes('.')) {
+        return next();
+    }
+    
+    // Redirect non-trailing-slash to trailing-slash (except root)
+    if (req.path !== '/' && !req.path.endsWith('/')) {
+        const query = req.url.slice(req.path.length);
+        return res.redirect(301, req.path + '/' + query);
+    }
+    
+    next();
+});
 
 // Serve static files from the Vite build
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -545,14 +562,12 @@ app.get('/umami/script.js', async (_req, res) => {
 });
 
 app.post('/umami/api/send', async (req, res) => {
-    if (!UMAMI_PROXY_BASE) {
-        return res.status(503).json({ error: 'Umami proxy is not configured.' });
-    }
+    const targetBase = UMAMI_PROXY_BASE || 'https://cloud.umami.is';
     try {
         // Forward correct IP to Umami
-        const clientIp = req.get('cf-connecting-ip') || req.ip || '';
+        const clientIp = req.get('cf-connecting-ip') || req.get('x-forwarded-for')?.split(',')[0] || req.ip || '';
 
-        const upstream = await fetch(`${UMAMI_PROXY_BASE}/api/send`, {
+        const upstream = await fetch(`${targetBase}/api/send`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -571,34 +586,7 @@ app.post('/umami/api/send', async (req, res) => {
     }
 });
 
-app.post('/api/send', async (req, res) => {
-    if (!UMAMI_PROXY_BASE) {
-        return res.status(503).json({ error: 'Umami proxy is not configured.' });
-    }
-    try {
-        const upstream = await fetch(`${UMAMI_PROXY_BASE}/api/send`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': req.get('user-agent') || ''
-            },
-            body: JSON.stringify(req.body ?? {})
-        });
-        const contentType = upstream.headers.get('content-type');
-        if (contentType) res.set('Content-Type', contentType);
-        const payload = await upstream.text();
-        return res.status(upstream.status).send(payload);
-    } catch (error) {
-        console.error('Umami send proxy failed:', error);
-        return res.status(502).json({ error: 'Umami proxy failed.' });
-    }
-});
-
-app.get('/api/auth/verify', requireAdmin, (req, res) => {
-    res.json({ ok: true });
-});
-
-// Fallback for SPA - Catch-all middleware
+// SPA Fallback
 app.use((req, res) => {
     if (fs.existsSync(path.join(__dirname, 'dist', 'index.html'))) {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));

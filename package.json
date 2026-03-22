@@ -8,7 +8,14 @@
     "prebuild": "tsx scripts/generate-seo.ts",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "tsx server.ts"
+    "start": "tsx server.ts",
+    "deploy": "bash deploy.sh",
+    "deploy:remote": "bash deploy.sh",
+    "pm2:logs": "pm2 logs arcanum-vitae --lines 100",
+    "pm2:status": "pm2 status arcanum-vitae",
+    "pm2:restart": "pm2 reload arcanum-vitae",
+    "pm2:stop": "pm2 stop arcanum-vitae",
+    "pm2:delete": "pm2 delete arcanum-vitae"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",

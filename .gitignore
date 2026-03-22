@@ -29,6 +29,8 @@ data/
 .env.*
 !.env.example
 
+# PM2
+.pm2
 
 # User Media
 public/media/audio/*

@@ -1,47 +1,84 @@
 #!/bin/bash
 
-# Arcanum Vitae - LXC Deployment Script
-# Target: Debian/Ubuntu based LXC container
+# Arcanum Vitae - LXC Initial Setup Script
+# Run this ONCE on a fresh LXC container to set up the environment
+# After initial setup, use ./deploy.sh for regular deployments
 
 set -e
 
-echo "--- Initializing Arcanum Vitae Deployment ---"
+echo "================================"
+echo "  Arcanum Vitae - Initial Setup"
+echo "================================"
+echo ""
 
-# 1. Update system and install dependencies
-echo "[1/6] Updating system and installing base dependencies..."
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then 
+    echo "Please run as root (sudo ./deploy-lxc.sh)"
+    exit 1
+fi
+
+# 1. Update system
+log_info "[1/5] Updating system packages..."
 apt update && apt upgrade -y
-apt install -y curl git build-essential
 
-# 2. Install Node.js 20
-echo "[2/6] Installing Node.js 20..."
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-apt install -y nodejs
+# 2. Install dependencies
+log_info "[2/5] Installing base dependencies..."
+apt install -y curl git build-essential rsync
 
-# 3. Install PM2 globally
-echo "[3/6] Installing PM2..."
+# 3. Install Node.js 20
+log_info "[3/5] Installing Node.js 20..."
+if ! command -v node &> /dev/null; then
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt install -y nodejs
+else
+    log_info "Node.js already installed: $(node --version)"
+fi
+
+# 4. Install PM2 globally
+log_info "[4/5] Installing PM2..."
 npm install -g pm2
 
-# 4. Preparing Application
-echo "[4/6] Installing application dependencies..."
-# Assumes the script is run from the root of the project directory inside LXC
-npm install
+# 5. Create app directory and set up structure
+APP_DIR="/opt/arcanum-vitae"
+log_info "[5/5] Setting up application directory at $APP_DIR..."
 
-# 5. Build Frontend
-echo "[5/6] Building frontend assets..."
-npm run build
+mkdir -p "$APP_DIR"
+mkdir -p "$APP_DIR/logs"
+mkdir -p "$APP_DIR/public/media/audio"
+mkdir -p "$APP_DIR/public/media/images"
 
-# 6. Start Application with PM2
-echo "[6/6] Starting application..."
-# Set your API Key here or in the environment before running
-# export GEMINI_API_KEY="your-api-key-here"
+# Create .gitkeep files
+touch "$APP_DIR/logs/.gitkeep"
+touch "$APP_DIR/public/media/audio/.gitkeep"
+touch "$APP_DIR/public/media/images/.gitkeep"
 
-pm2 delete arcanum-vitae || true
-pm2 start npx --name "arcanum-vitae" -- tsx server.ts
+# Set ownership
+chown -R $SUDO_USER:$SUDO_USER "$APP_DIR" 2>/dev/null || chown -R root:root "$APP_DIR"
 
-# Save PM2 state to restart on boot
-pm2 save
-pm2 startup
-
-echo "--- Deployment Complete ---"
-echo "The application is running on port 3000."
-echo "Configure HA-Proxy to point to this container's IP on port 3000."
+echo ""
+echo "================================"
+log_success "Initial setup complete!"
+echo "================================"
+echo ""
+echo "Next steps:"
+echo "1. Copy your project files to: $APP_DIR"
+echo "2. Or run: ./deploy.sh $APP_DIR"
+echo "3. Or deploy remotely: ./deploy.sh <host> root $APP_DIR"
+echo ""
+echo "Don't forget to set your .env file with:"
+echo "  - GEMINI_API_KEY"
+echo "  - ADMIN_KEY"
+echo ""
